@@ -1,0 +1,242 @@
+Some Commands:
+1. create user bbvs@localhost identified with mysql_native_password by 'Password00$$' ;
+
+2. grant all privileges on . to bbvs@localhost ;
+
+3. create database bbvs;
+
+4. truffle migrate
+
+5. truffle migrate --reset
+
+6. npm run typeorm migration:run
+
+7. .env file
+ACCESS_TOKEN_SECRET=976a66a5bd23b2050019f380c4decbbefdf8ff91cf502c68a3fe1ced91d7448cc54ce6c847657d53294e40889cef5bd996ec5b0fefc1f56270e06990657eeb6e
+
+REFRESH_TOKEN_SECRET=5f567afa6406225c4a759daae77e07146eca5df8149353a844fa9ab67fba22780cb4baa5ea508214934531a6f35e67e96f16a0328559111c597856c660f177c2
+ npx ts-node src/index.ts 
+
+admin login detail:
+email: john@gmail.com
+password: john@gmail.com
+
+PS D:\Blockchain-Based-Voting-System-main\Blockchain-Based-Voting-System-main> mysql -u root -p
+Enter password: ******
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 8.0.42 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+mysql> create user bbvs@localhost identified with mysql_native_password by 'Password00$$' ;
+Query OK, 0 rows affected (8.18 sec)
+
+mysql> grant all privileges on . to bbvs@localhost ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '. to bbvs@localhost' at line 1
+mysql> grant all privileges on "." to bbvs@localhost ; 
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '"." to bbvs@localhost' at line 1
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'bbvs'@'localhost';
+Query OK, 0 rows affected (1.75 sec)
+
+mysql> select user from mysql.user;
++------------------+
+| user             |
++------------------+
+| bbvs             |
+| mysql.infoschema |
+| mysql.session    |
+| mysql.sys        |
+| root             |
++------------------+
+5 rows in set (0.26 sec)
+
+mysql> create database bbvs;
+Query OK, 1 row affected (0.43 sec)
+mysql>use bbvs;
+Database changed
+mysql> show database;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'database' at line 1
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| bbvs               |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (1.14 sec)
+
+mysql> drop user bbvs@localhost ;
+Query OK, 0 rows affected (2.57 sec)
+
+mysql> create user bbvs@localhost identified with mysql_native_password by 'Password00$$' ; 
+Query OK, 0 rows affected (0.50 sec)
+
+mysql> grant all privileges on "." to bbvs@localhost ; 
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '"." to bbvs@localhost' at line 1
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'bbvs'@'localhost';
+Query OK, 0 rows affected (0.30 sec)
+
+mysql> select * from user ;
+ERROR 1046 (3D000): No database selected
+mysql> use bbvs;
+Database changed
+mysql> select * from user ;
++----+------+-------------------+----------------+--------------------------------------------------------------+-------+----------+
+| id | name | citizenshipNumber | email          | password                                                     | admin | verified |
++----+------+-------------------+----------------+--------------------------------------------------------------+-------+----------+
+|  1 | John | 9860777906        | john@gmail.com | $2b$10$6sdkothEwAguhA0FytsGF.gcWPmTDB5hosif6rGX5FFJK8PdBgRHu |    
+ 1 |        1 |
+|  2 | Liza | 9860777907        | liza@gmail.com | $2b$10$70yLw0dPhAD0py/iiGUInO7kklGUmbMfa5BmXKGCXEID1ufTsqSQ6 |    
+ 0 |        1 |
+|  3 | Ben  | 9860777908        | ben@gmail.com  | $2b$10$1DsQFSqUs3ufyDDRBd9wYuU5i9ihbnYR4GCYJsI3IzGXamwFWnr4S |    
+ 0 |        1 |
++----+------+-------------------+----------------+--------------------------------------------------------------+-------+----------+
+3 rows in set (0.04 sec)
+
+mysql> ^C
+mysql>                    
+my sql setup 
+PS D:\Blockchain-Based-Voting-System-main> mysql -u root -p
+Enter password: **********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 17
+Server version: 8.0.42 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| bbvs               |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.01 sec)
+
+mysql> drop user bbvs@localhost ;
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> create user bbvs@localhost identified with mysql_native_password by 'Password00$$' ; 
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'bbvs'@'localhost';
+Query OK, 0 rows affected (0.14 sec)
+
+mysql> select * from user ;
+ERROR 1046 (3D000): No database selected
+mysql>  use bbvs;
+Database changed
+mysql> select * from user ;
++----+------+-------------------+----------------+--------------------------------------------------------------+-------+----------+
+| id | name | citizenshipNumber | email          | password                                                     | admin | verified |
++----+------+-------------------+----------------+--------------------------------------------------------------+-------+----------+
+|  1 | John | 9860777906        | john@gmail.com | $2b$10$6sdkothEwAguhA0FytsGF.gcWPmTDB5hosif6rGX5FFJK8PdBgRHu |     1 |        1 |
+|  2 | Liza | 9860777907        | liza@gmail.com | $2b$10$70yLw0dPhAD0py/iiGUInO7kklGUmbMfa5BmXKGCXEID1ufTsqSQ6 |     0 |        1 |
+|  3 | Ben  | 9860777908        | ben@gmail.com  | $2b$10$1DsQFSqUs3ufyDDRBd9wYuU5i9ihbnYR4GCYJsI3IzGXamwFWnr4S |     0 |        1 |
++----+------+-------------------+----------------+--------------------------------------------------------------+-------+----------+
+3 rows in set (0.00 sec)
+
+mysql>
+// backend setupPS D:\Blockchain-Based-Voting-System-main> cd backend
+PS D:\Blockchain-Based-Voting-System-main\backend> truffle migrate  
+This version of µWS is not compatible with your Node.js build:
+
+Error: Cannot find module '../binaries/uws_win32_x64_127.node'
+Require stack:
+- C:\Users\Kameshraja K\AppData\Roaming\npm\node_modules\truffle\node_modules\ganache\node_modules\@trufflesuite\uws-js-unofficial\src\uws.js
+- C:\Users\Kameshraja K\AppData\Roaming\npm\node_modules\truffle\node_modules\ganache\dist\node\core.js
+- C:\Users\Kameshraja K\AppData\Roaming\npm\node_modules\truffle\build\migrate.bundled.js
+- C:\Users\Kameshraja K\AppData\Roaming\npm\node_modules\truffle\node_modules\original-require\index.js
+- C:\Users\Kameshraja K\AppData\Roaming\npm\node_modules\truffle\build\cli.bundled.js
+Falling back to a NodeJS implementation; performance may be degraded.
+
+
+
+Compiling your contracts...
+===========================
+> Compiling .\contracts\Election.sol
+> Compiling .\contracts\Migrations.sol
+> Artifacts written to D:\Blockchain-Based-Voting-System-main\backend\build\contracts
+> Compiled successfully using:
+   - solc: 0.8.11+commit.d7f03943.Emscripten.clang
+Network up to date.
+PS D:\Blockchain-Based-Voting-System-main\backend> npm run typeorm migration:run
+
+> typeorm
+> node --require ts-node/register ./node_modules/typeorm/cli.js migration:run
+
+query: SELECT * FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'bbvs' AND `TABLE_NAME` = 'migrations'
+query: CREATE TABLE `migrations` (`id` int NOT NULL AUTO_INCREMENT, `timestamp` bigint NOT NULL, `name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB
+query: SELECT * FROM `bbvs`.`migrations` `migrations` ORDER BY `id` DESC
+0 migrations are already loaded in the database.
+3 migrations were found in the source code.
+3 migrations are new migrations that needs to be executed.
+query: START TRANSACTION
+query: CREATE TABLE `candidate` (`id` int NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `pollId` int NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB
+query: CREATE TABLE `poll` (`id` int NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB
+query: CREATE TABLE `user` (`id` int NOT NULL AUTO_INCREMENT, `name` varchar(100) NOT NULL, `citizenshipNumber` varchar(255) NOT NULL, `email` varchar(180) NOT NULL, `password` varchar(255) NOT NULL, `admin` tinyint NOT NULL, UNIQUE INDEX `IDX_5cccbf6f2ad61b287544ddf45d` (`citizenshipNumber`), UNIQUE INDEX `IDX_e12875dfb3b1d92d7d7c5377e2` (`email`), PRIMARY KEY (`id`)) ENGINE=InnoDB
+query: ALTER TABLE `candidate` ADD CONSTRAINT `FK_01e0d963db31f953b94d0446e17` FOREIGN KEY (`pollId`) REFERENCES `poll`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+query: INSERT INTO `bbvs`.`migrations`(`timestamp`, `name`) VALUES (?, ?) -- PARAMETERS: [1645167790939,"initial1645167790939"]
+Migration initial1645167790939 has been executed successfully.
+query: ALTER TABLE `user` ADD `verified` tinyint NOT NULL DEFAULT 0
+query: INSERT INTO `bbvs`.`migrations`(`timestamp`, `name`) VALUES (?, ?) -- PARAMETERS: [1645175354681,"userUpdate1645175354681"]        
+Migration userUpdate1645175354681 has been executed successfully.
+query: START TRANSACTION
+query: INSERT INTO `user`(`id`, `name`, `citizenshipNumber`, `email`, `password`, `admin`, `verified`) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?) -- PARAMETERS: ["John","9860777906","john@gmail.com","$2b$10$6sdkothEwAguhA0FytsGF.gcWPmTDB5hosif6rGX5FFJK8PdBgRHu",1,1]
+query: SELECT `User`.`id` AS `User_id`, `User`.`verified` AS `User_verified` FROM `user` `User` WHERE `User`.`id` = ? -- PARAMETERS: [1]  
+query: INSERT INTO `user`(`id`, `name`, `citizenshipNumber`, `email`, `password`, `admin`, `verified`) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?) -- PARAMETERS: ["Liza","9860777907","liza@gmail.com","$2b$10$70yLw0dPhAD0py/iiGUInO7kklGUmbMfa5BmXKGCXEID1ufTsqSQ6",0,1]
+query: SELECT `User`.`id` AS `User_id`, `User`.`verified` AS `User_verified` FROM `user` `User` WHERE `User`.`id` = ? -- PARAMETERS: [2]  
+query: INSERT INTO `user`(`id`, `name`, `citizenshipNumber`, `email`, `password`, `admin`, `verified`) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?) -- PARAMETERS: ["Ben","9860777908","ben@gmail.com","$2b$10$1DsQFSqUs3ufyDDRBd9wYuU5i9ihbnYR4GCYJsI3IzGXamwFWnr4S",0,1]
+query: SELECT `User`.`id` AS `User_id`, `User`.`verified` AS `User_verified` FROM `user` `User` WHERE `User`.`id` = ? -- PARAMETERS: [3]  
+query: COMMIT
+query: INSERT INTO `bbvs`.`migrations`(`timestamp`, `name`) VALUES (?, ?) -- PARAMETERS: [1645187823173,"users1645187823173"]
+Migration users1645187823173 has been executed successfully.
+query: COMMIT
+PS D:\Blockchain-Based-Voting-System-main\backend> 
+// front end 
+PS D:\Blockchain-Based-Voting-System-main> nvm version
+1.2.2
+PS D:\Blockchain-Based-Voting-System-main> cd frontend
+PS D:\Blockchain-Based-Voting-System-main\frontend> npm install
+npm warn deprecated source-map-url@0.4.1: See https://github.com/lydell/source-map-url#deprecated
+npm warn deprecated source-map-resolve@0.6.0: See https://github.com/lydell/source-map-resolve#deprecated
+npm warn deprecated har-validator@5.1.5: this library is no longer supported
+npm warn deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+npm warn deprecated request@2.88.2: request has been deprecated, see https://github.com/request/request/issues/3142
+npm warn deprecated svgo@1.3.2: This SVGO version is no longer supported. Upgrade to v2.x.x.
+
+added 1577 packages, and audited 1578 packages in 2m
+
+188 packages are looking for funding
+  run `npm fund` for details
+
+56 vulnerabilities (3 low, 13 moderate, 35 high, 5 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+PS D:\Blockchain-Based-Voting-System-main\frontend> 
