@@ -1,34 +1,97 @@
 .profile-wrapper {
+  @include glass;
   @include box-shadow;
-  padding: 50px;
+  padding: 60px;
   display: grid;
-  border-radius: 10px;
+  border-radius: 24px;
   box-sizing: border-box;
-  grid-template-columns: 1fr 2fr;
-  column-gap: 100px;
+  grid-template-columns: 1fr 1.5fr;
+  column-gap: 80px;
+  max-width: 1000px;
+  margin: 40px auto;
+  animation: fadeInScale 0.5s ease-out;
 
   .left-panel {
     text-align: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding-right: 80px;
 
     .person-icon {
-      * {
-        font-size: 4rem;
-        color: $theme-primary;
+      margin-bottom: 24px;
+
+      i {
+        font-size: 6rem;
+        background: linear-gradient(135deg, $theme-primary, $theme-accent);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
     }
 
     .username {
-      padding: 20px 0 20px 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: $text-light;
+      margin-bottom: 8px;
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(99, 102, 241, 0.1);
+      color: $theme-primary;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      margin-bottom: 40px;
+    }
+
+    .logout-btn {
+      width: 100%;
+      max-width: 200px;
     }
   }
 
   .right-panel {
-    .skeleton {
-      height: 30px;
-      width: 200px;
-      background: $theme-gray;
-      margin-top: 30px;
-      border-radius: 10px;
+    .title-small {
+      display: block;
+      margin-bottom: 40px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: $theme-accent;
+    }
+
+    .profile-field {
+      margin-bottom: 28px;
+
+      label {
+        display: block;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: $text-muted;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .profile-value {
+        font-size: 1.1rem;
+        color: $text-light;
+        font-weight: 500;
+
+        &.status-success {
+          color: #10b981;
+          font-weight: 700;
+        }
+
+        &.status-pending {
+          color: #f59e0b;
+          font-style: italic;
+        }
+      }
     }
   }
 }

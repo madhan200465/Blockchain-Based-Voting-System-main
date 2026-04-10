@@ -2,13 +2,36 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 
-$theme-gray: #f6f6f6;
-$theme-black: #333333;
-$theme-primary: #4daaa7;
-$theme-secondary: #3f8f8b;
+$theme-bg: #0f172a; // Deep slate blue-black
+$theme-gray: #1e293b;
+$theme-black: #020617;
+$theme-primary: #6366f1; // Indigo
+$theme-secondary: #4f46e5;
+$theme-accent: #14b8a6; // Teal
+$text-light: #f8fafc;
+$text-muted: #94a3b8;
+
+@mixin glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
 @mixin box-shadow {
-  box-shadow: 2px 2px 10px rgba(50, 50, 50, 0.1);
+  box-shadow: 0 10px 30px -10px rgba(2, 6, 23, 0.5);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 body,
@@ -16,11 +39,14 @@ html {
   position: relative;
   margin: 0;
   padding: 0;
-  // font-family: "Inter", sans-serif;
-  font-family: "Josefin Sans", sans-serif;
+  font-family: "Inter", sans-serif;
+  background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+  background-attachment: fixed;
+  color: $text-light;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: $theme-black;
+  line-height: 1.5;
+  min-height: 100vh;
 }
 
 code {
@@ -31,67 +57,106 @@ code {
 button {
   border: none;
   outline: none;
-  border-radius: 5px;
-  padding: 10px;
-  margin-right: 5px;
+  border-radius: 8px;
+  padding: 12px 24px;
+  margin-right: 10px;
   cursor: pointer;
-  transition: 0.3s;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .button-black {
   background-color: $theme-black;
   color: white;
+
+  &:hover {
+    background-color: lighten($theme-black, 10%);
+  }
 }
+
 .button-primary {
-  background-color: $theme-primary;
+  background: linear-gradient(135deg, $theme-primary, $theme-secondary);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .button-secondary {
-  background-color: $theme-secondary;
-  color: white;
+  background-color: $theme-gray;
+  color: $text-light;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  &:hover {
+    background-color: lighten($theme-gray, 5%);
+  }
 }
 
 button,
 .title-large,
 .title-small {
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .title-large {
-  font-size: 2.8rem;
-  font-weight: 900;
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: linear-gradient(to right, $text-light, $text-muted);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
 }
 
 .title-small {
-  font-size: 1.6rem;
-  font-weight: 300;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: $theme-accent;
+  margin-bottom: 0.5rem;
 }
 
 .text-normal {
-  font-weight: 300;
+  font-weight: 400;
+  color: $text-muted;
+  font-size: 1.1rem;
 }
 
 .success-message,
 .error-message {
+  @include glass;
   box-sizing: border-box;
-  width: 400px;
-  padding: 20px 30px 20px 30px;
-  border-radius: 10px;
-  margin-bottom: 50px;
-  color: white;
+  width: 100%;
+  max-width: 450px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  animation: fadeInScale 0.4s ease-out;
 
   span {
-    margin-right: 10px;
+    margin-right: 12px;
+    font-size: 1.2rem;
   }
 }
 
 .success-message {
-  background-color: $theme-primary;
+  border-left: 4px solid $theme-accent;
+  color: lighten($theme-accent, 20%);
 }
 
 .error-message {
-  background-color: red;
+  border-left: 4px solid #ef4444;
+  color: #fca5a5;
 }
 
 @import "./layouts/Boxes.scss";
@@ -113,3 +178,100 @@ button,
 @import "./components/Features/Feature.scss";
 @import "./components/Polls/Chart.scss";
 @import "./components/Polls/Panel.scss";
+@import "./components/BiometricScanner.scss";
+@import "./components/Analytics.scss";
+
+/* Premium Ballot Styles */
+.ballot-container {
+    margin-top: 20px;
+    animation: fadeInScale 0.6s ease-out;
+
+    .ballot-header {
+        text-align: center;
+        margin-bottom: 40px;
+        
+        h3 {
+            color: $theme-accent;
+            font-size: 1.5rem;
+        }
+    }
+}
+
+.candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.candidate-card {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        transform: translateY(-8px) scale(1.02);
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .candidate-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: $text-light;
+    }
+
+    .candidate-status {
+        font-size: 0.85rem;
+        color: $text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 25px;
+    }
+
+    .vote-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
+.card-premium {
+    @include glass;
+    @include box-shadow;
+    border-radius: 20px;
+    background: rgba(30, 41, 59, 0.5);
+}
+
+.voted-badge {
+    color: $theme-accent;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+}
+
+.post-vote-message {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: $text-muted;
+    font-size: 0.95rem;
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(99, 102, 241, 0.05);
+
+    i {
+        font-size: 1.2rem;
+        color: $theme-primary;
+    }
+}

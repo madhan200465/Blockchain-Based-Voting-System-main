@@ -4,12 +4,12 @@ import ElectionContract, { web3 } from "../../web3";
 
 const schema = yup.object({
   body: yup.object({
-    name: yup.string().min(3).required(),
-    description: yup.string().min(10).required(),
+    name: yup.string().min(1).required(),
+    description: yup.string().min(1).required(),
     candidates: yup.array(
       yup.object({
-        name: yup.string().min(3),
-        info: yup.string().min(10),
+        name: yup.string().min(1),
+        info: yup.string().min(1),
       })
     ),
   }),

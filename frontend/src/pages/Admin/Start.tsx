@@ -4,8 +4,8 @@ import axios from "../../axios";
 import * as yup from "yup";
 
 const schema = yup.object({
-  name: yup.string().min(3).required(),
-  description: yup.string().min(10).required(),
+  name: yup.string().min(1).required(),
+  description: yup.string().min(1).required(),
 });
 
 interface Candidate {
@@ -43,12 +43,12 @@ const Start = () => {
           for (let i = 0; i < candidates.length; i++) {
             const candidate = candidates[i];
 
-            if (candidate.name.length < 3) {
+            if (candidate.name.length < 1) {
               candidatesError = "invalid name " + candidate.name;
               break;
             }
 
-            if (candidate.info.length < 10) {
+            if (candidate.info.length < 1) {
               candidatesError = "invalid info for " + candidate.name;
               break;
             }

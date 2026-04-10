@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import BackButton from "../components/Back";
 
 type MenuLink = {
   name: string;
@@ -73,7 +73,10 @@ const Default = (props: DefaultProps) => {
         </div>
       </div>
 
-      <div className="default-content">{props.children}</div>
+      <div className="default-content">
+        <BackButton call={() => navigate(-1)} />
+        {props.children}
+      </div>
     </div>
   );
 };

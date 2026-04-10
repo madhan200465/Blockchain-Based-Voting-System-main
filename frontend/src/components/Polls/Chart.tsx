@@ -6,23 +6,37 @@ interface ChartProps {
   enableVote?: boolean;
   userId?: number;
   userName?: string;
+  showResults?: boolean;
 }
 
 const Chart = (props: ChartProps) => {
+  const showResults = props.showResults ?? true;
   const votes = props.votes;
 
   const getButtons = () => {
     const names = [];
 
     const vote = (candidate: string) => {
+      const voterId = window.prompt("Please enter your Voter ID (Citizenship Number) to verify your vote:");
+
+      if (!voterId) return;
+
       axios
         .post("/polls/vote", {
           id: props.userId?.toString(),
           name: props.userName,
           candidate,
+          voterId,
         })
-        .then((_) => window.location.reload())
-        .catch((err) => console.log({ err }));
+        .then((_) => {
+          alert("Vote Cast Successfully!");
+          window.location.reload();
+        })
+        .catch((err) => {
+          const errorMsg = err.response?.data || err.message;
+          alert("Error: " + errorMsg);
+          console.log({ err });
+        });
     };
 
     for (const name in votes) {
@@ -67,6 +81,8 @@ const Chart = (props: ChartProps) => {
   const getBars = () => {
     const bars = [];
     const total = getTotal();
+
+    if (total === 0) return null;
 
     for (const name in votes) {
       const count = votes[name];

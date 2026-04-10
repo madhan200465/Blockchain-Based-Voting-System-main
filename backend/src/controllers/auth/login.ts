@@ -7,7 +7,8 @@ import dayjs from "dayjs";
 
 const schema = yup.object({
   body: yup.object({
-    email: yup.string().email().required(),
+    email: yup.string().email(),
+    voterId: yup.string(),
     password: yup.string().min(3).required(),
   }),
 });
@@ -15,25 +16,48 @@ const schema = yup.object({
 export default async (req: Request, res: Response) => {
   let user = null;
 
-  // throws error when the POST-ed queries are invalide (email and password)
   try {
     await schema.validate(req);
   } catch (error: any) {
     return res.status(400).send(error.errors);
   }
 
-  // throws error if user with provided email not found
-  try {
-    user = await User.findOneOrFail({ email: req.body.email });
-  } catch (error: any) {
-    return res.status(404).send(error);
+  const { email, voterId, password } = req.body;
+  const trimmedEmail = email?.trim();
+  const trimmedVoterId = voterId?.trim();
+
+  if (!trimmedEmail && !trimmedVoterId) {
+    return res.status(400).send("Email or Voter ID is required");
   }
 
-  if (!user.verified) return res.status(400).send("Not verified");
+  try {
+    if (trimmedVoterId) {
+      user = await User.findOneOrFail({ citizenshipNumber: trimmedVoterId });
+    } else {
+      user = await User.findOneOrFail({ email: trimmedEmail });
+    }
+  } catch (error: any) {
+    return res.status(404).send("User not found");
+  }
 
   const match = await bcrypt.compare(req.body.password, user.password);
   //exits if password doesn't match
   if (!match) return res.status(400).send("password doesn't match");
+
+  // If the user isn't verified, we return the user object but NO token.
+  if (!user.verified) {
+      return res.status(403).send({ 
+          user: {
+              id: user.id,
+              name: user.name,
+              citizenshipNumber: user.citizenshipNumber,
+              email: user.email,
+              verified: false
+          },
+          needsVerification: true,
+          message: "Account Pending Approval"
+      });
+  }
 
   // if the code reaches here then the user is authenticated
   // hurray :D
@@ -60,17 +84,21 @@ export default async (req: Request, res: Response) => {
     citizenshipNumber: user.citizenshipNumber,
     email: user.email,
     admin: user.admin,
+    verified: user.verified,
   };
   const accessToken = jwt.sign(plainUserObject, accessTokenSecret, {
-    expiresIn: 60,
+    expiresIn: 3600,
   });
   const refreshToken = jwt.sign(plainUserObject, refreshTokenSecret, {
     expiresIn: "7d",
   });
 
   res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
     expires: dayjs().add(7, "days").toDate(),
   });
 
-  return res.send({ user, accessToken });
+  return res.send({ user: plainUserObject, accessToken });
 };

@@ -6,6 +6,11 @@ Overview
 
 This is a secure, transparent, and decentralized voting system built using blockchain technology. The application leverages Node.js, TypeScript, SQL (for database management), and Bootstrap for a responsive front-end interface. The system ensures immutability, auditability, and fairness in the voting process.
 
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **Election Commission** | `admin@test.com` | **`test1234`** |
+| **Verified Voter** | `john1@gmail.com` | **`test1234`** |
+
 Features
 
 

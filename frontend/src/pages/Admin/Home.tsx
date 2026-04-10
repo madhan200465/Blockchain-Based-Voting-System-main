@@ -22,12 +22,22 @@ const Home = (props: RouteProps): JSX.Element => {
       .catch((error) => console.log({ error }));
   }, []);
 
-  if (loading) return <div></div>;
+  if (loading) return <div className="loading-state">Loading Committee Dashboard...</div>;
 
-  if (status === "finished") return <ResultPage />;
-  if (status === "running") return <PollsPage />;
+  return (
+    <div className="admin-dashboard-container">
+      <div className="dashboard-header">
+        <h2 className="title-small">Election Commission Dashboard</h2>
+        <p className="text-normal">Status: <span className={`status-badge ${status}`}>{status}</span></p>
+      </div>
 
-  return <StartPage />;
+      <div className="dashboard-content">
+        {status === "finished" && <ResultPage />}
+        {status === "running" && <PollsPage />}
+        {status === "not-started" && <StartPage />}
+      </div>
+    </div>
+  );
 };
 
 export default Home;

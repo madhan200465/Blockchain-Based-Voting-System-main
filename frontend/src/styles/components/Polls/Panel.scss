@@ -1,14 +1,23 @@
 .polls-container {
-  @include box-shadow;
-  margin-top: 50px;
+  @include glass;
+  margin-top: 40px;
   text-align: center;
-  padding: 50px;
-  border-radius: 10px;
+  padding: 48px;
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
   position: relative;
+  @include box-shadow;
+  animation: fadeInScale 0.5s ease-out;
+
+  h1 {
+    font-weight: 800;
+    margin-bottom: 2rem;
+    color: $theme-primary;
+  }
 
   .votes-wrapper {
-    padding-top: 50px;
+    padding-top: 40px;
+    width: 100%;
   }
 }

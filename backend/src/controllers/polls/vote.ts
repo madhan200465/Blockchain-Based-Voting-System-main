@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import ElectionContract, { web3 } from "../../web3";
-// import memoryCache from "memory-cache";
+import { User } from "../../entity/User";
 import * as yup from "yup";
 
 const checkSchema = yup.object({
@@ -16,13 +16,19 @@ export const checkVoteability = async (req: Request, res: Response) => {
     return res.status(400).send({ error });
   }
 
+  const { id } = req.body;
+  const user = await User.findOne({ where: { id } });
+  if (!user) return res.status(404).send("User not found");
+
   const instance = await ElectionContract.deployed();
   const voters: Array<any> = await instance.getVoters();
   const status: "not-started" | "running" | "finished" =
     await instance.getStatus();
 
   if (status !== "running") return res.status(400).send("election not running");
-  if (voters.includes(req.body.id)) return res.send("already-voted");
+  
+  // Use citizenshipNumber to check if already voted on blockchain
+  if (voters.includes(user.citizenshipNumber)) return res.send("already-voted");
 
   return res.send("not-voted");
 };
@@ -32,6 +38,7 @@ const schema = yup.object({
     id: yup.string().required(),
     name: yup.string().min(3).required(),
     candidate: yup.string().min(3).required(),
+    voterId: yup.string().required("Voter ID is required"),
   }),
 });
 
@@ -42,20 +49,39 @@ export default async (req: Request, res: Response) => {
     return res.status(400).send(error.errors);
   }
 
+  const { id, name, candidate, voterId } = req.body;
+
+  // 1. Fetch user from DB
+  const user = await User.findOne({ where: { id } });
+  if (!user) return res.status(404).send("User not found");
+
+  // 2. Check if user is verified
+  if (!user.verified) return res.status(401).send("User not verified by Election Commission");
+
+  // 3. Verify Voter ID matches Citizenship Number
+  if (user.citizenshipNumber !== voterId) {
+    return res.status(401).send("Invalid Voter ID Number");
+  }
+
   const accounts = await web3.eth.getAccounts();
   const instance = await ElectionContract.deployed();
   const voters: Array<any> = await instance.getVoters();
   const candidates: Array<any> = await instance.getCandidates();
 
-  if (voters.includes(req.body.id))
-    return res.status(400).send("already voted");
+  // Pillar 2: Blockchain-level deduplication check
+  if (voters.includes(user.citizenshipNumber))
+    return res.status(400).send("Duplicate Voting Detected: This Voter ID has already cast a ballot.");
 
-  if (!candidates.includes(req.body.candidate))
-    return res.status(400).send("no such candidate");
+  if (!candidates.includes(candidate))
+    return res.status(400).send("No such candidate");
 
-  await instance.vote(req.body.id, req.body.name, req.body.candidate, {
-    from: accounts[0],
-  });
-
-  return res.send("successful");
+  try {
+    // Cast vote using citizenshipNumber as the anchor
+    await instance.vote(user.citizenshipNumber, name, candidate, {
+      from: accounts[0],
+    });
+    return res.send("successful");
+  } catch (error: any) {
+    return res.status(500).send("Blockchain Transaction Failed: " + error.message);
+  }
 };

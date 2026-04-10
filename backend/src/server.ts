@@ -8,12 +8,21 @@ import usersRouter from "./routers/users";
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use("/auth", authRouter);
 app.use("/polls", pollsRouter);
 app.use("/users", usersRouter);
+
+app.get("/ping", (req: Request, res: Response) => {
+  res.send({ status: "ok", message: "pong" });
+});
 
 app.get("/", (req: Request, res: Response) => {
   console.log(req.cookies);

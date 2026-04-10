@@ -34,6 +34,7 @@ export default async (req: Request, res: Response) => {
   newUser.email = req.body.email;
   newUser.password = hashedPassword;
   newUser.citizenshipNumber = req.body.citizenshipNumber;
+  newUser.verified = false;
 
   try {
     await User.save(newUser);

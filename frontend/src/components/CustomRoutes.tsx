@@ -3,7 +3,6 @@ import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
-import View from "../pages/View";
 import { AuthContext } from "../contexts/Auth";
 import UserPollsPage from "../pages/User/Polls";
 import HomePage from "../pages/Admin/Home";
@@ -16,20 +15,33 @@ export default () => {
   const authContext = useContext(AuthContext);
 
   const getRoutes = (): JSX.Element => {
-    if (authContext.loading) return <div>loading...</div>;
+    if (authContext.loading) return (
+      <div style={{ 
+        display: 'flex', 
+        height: '100vh', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: '#0f172a',
+        color: '#6366f1',
+        fontSize: '1.5rem',
+        fontWeight: 'bold'
+      }}>
+        Initializing Voting System...
+      </div>
+    );
 
     if (authContext.authenticated) {
       // if the user is authenticated then
 
       const adminMenu = [
-        { name: "Home", link: "/" },
-        { name: "Verify Users", link: "/users" },
-        { name: "Profile", link: "/profile" },
+        { name: "Election Dashboard", link: "/" },
+        { name: "Voter Verification", link: "/users" },
+        { name: "My Profile", link: "/profile" },
       ];
 
       const userMenu = [
-        { name: "Polls", link: "/" },
-        { name: "Profile", link: "/profile" },
+        { name: "Active Ballots", link: "/" },
+        { name: "Voter Profile", link: "/profile" },
       ];
 
       if (authContext.isAdmin) {
@@ -61,8 +73,9 @@ export default () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/login/voter" element={<Login type="voter" />} />
+          <Route path="/login/admin" element={<Login type="admin" />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/view" element={<View />} />
         </Routes>
       );
     }

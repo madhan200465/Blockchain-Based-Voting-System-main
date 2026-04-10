@@ -7,16 +7,17 @@ import endController from "../controllers/polls/end";
 import resetController from "../controllers/polls/reset";
 import votesController from "../controllers/polls/votes";
 import voteController, { checkVoteability } from "../controllers/polls/vote";
+import { adminOnly } from "../middlewares/auth";
 
 const router = express.Router();
 
 router.get("/", fetchController);
 router.get("/status", statusController);
-router.get("/votes", votesController);
+router.get("/votes", adminOnly, votesController);
 
-router.post("/start", startController);
-router.post("/end", endController);
-router.post("/reset", resetController);
+router.post("/start", adminOnly, startController);
+router.post("/end", adminOnly, endController);
+router.post("/reset", adminOnly, resetController);
 router.post("/check-voteability", checkVoteability);
 router.post("/vote", voteController);
 

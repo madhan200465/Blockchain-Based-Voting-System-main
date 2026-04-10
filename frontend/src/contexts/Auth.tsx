@@ -9,18 +9,24 @@ type ContextProps = {
 type User = {
   id: number;
   name: string;
+  email: string;
+  citizenshipNumber: string;
   admin: boolean;
+  verified: boolean;
 };
 
 export const AuthContext = createContext({
   id: 0,
   name: "",
+  email: "",
+  citizenshipNumber: "",
   isAdmin: false,
+  isVerified: false,
   authenticated: false,
   accessToken: "",
   loading: true,
-  authenticate: (user: User, token: string) => {},
-  logout: () => {},
+  authenticate: (user: User, token: string) => { },
+  logout: () => { },
 });
 
 export default (props: ContextProps): JSX.Element => {
@@ -29,7 +35,10 @@ export default (props: ContextProps): JSX.Element => {
   const [authentication, setAuthentication] = useState({
     id: 0,
     name: "",
+    email: "",
+    citizenshipNumber: "",
     isAdmin: false,
+    isVerified: false,
     authenticated: false,
     accessToken: "",
     loading: true,
@@ -41,14 +50,14 @@ export default (props: ContextProps): JSX.Element => {
       .then((res) => authenticate(res.data.user, res.data.accessToken, false))
       .catch((error) => {
         console.log(error);
-        setAuthentication({ ...authentication, loading: false });
+        setAuthentication((prev) => ({ ...prev, loading: false }));
       });
   };
 
   useEffect(() => {
     checkAuthentication();
 
-    const interval = setInterval(checkAuthentication, 5 * 1000);
+    const interval = setInterval(checkAuthentication, 30 * 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -58,10 +67,16 @@ export default (props: ContextProps): JSX.Element => {
     token: string,
     redirect: boolean = true
   ) => {
+    // Immediate axios sync
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
     setAuthentication({
       id: user.id,
       name: user.name,
+      email: user.email,
+      citizenshipNumber: user.citizenshipNumber,
       isAdmin: user.admin,
+      isVerified: user.verified,
       authenticated: true,
       accessToken: token,
       loading: false,
@@ -73,10 +88,16 @@ export default (props: ContextProps): JSX.Element => {
   const logout = async () => {
     await axios.post("/auth/logout");
 
+    // Clear axios header
+    delete axios.defaults.headers.common["Authorization"];
+
     setAuthentication({
       id: 0,
       name: "",
+      email: "",
+      citizenshipNumber: "",
       isAdmin: false,
+      isVerified: false,
       authenticated: false,
       accessToken: "",
       loading: false,
@@ -90,7 +111,10 @@ export default (props: ContextProps): JSX.Element => {
       value={{
         id: authentication.id,
         name: authentication.name,
+        email: authentication.email,
+        citizenshipNumber: authentication.citizenshipNumber,
         isAdmin: authentication.isAdmin,
+        isVerified: authentication.isVerified,
         authenticated: authentication.authenticated,
         accessToken: authentication.accessToken,
         loading: authentication.loading,

@@ -29,22 +29,24 @@ export default async (req: Request, res: Response) => {
     const userPlainObj = {
       id: user.id,
       name: user.name,
-      phone: user.phone,
+      citizenshipNumber: user.citizenshipNumber,
       email: user.email,
       admin: user.admin,
+      verified: user.verified,
     };
 
     const accessToken = jwt.sign(userPlainObj, accessTokenSecret, {
-      expiresIn: 60, // 10 minutes
+      expiresIn: 3600, // 1 hour
     });
 
     const newRefreshToken = jwt.sign(userPlainObj, refreshTokenSecret, {
       expiresIn: "7d",
     });
 
-    res.cookie("refresh", newRefreshToken, {
-      secure: true,
+    res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
+      sameSite: "lax",
+      path: "/",
       expires: dayjs().add(7, "days").toDate(),
     });
 

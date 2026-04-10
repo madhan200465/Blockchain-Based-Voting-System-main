@@ -4,10 +4,10 @@ import { Formik } from "formik";
 import LoginLayout from "../layouts/Login";
 import * as Yup from "yup";
 import axios from "../axios";
+import BiometricScanner from "../components/Auth/BiometricScanner";
 
 const schema = Yup.object().shape({
   name: Yup.string().min(3).required(),
-  email: Yup.string().email("Invalid email").required("Required"),
   citizenshipNumber: Yup.string().min(4).required(),
   password: Yup.string().min(3).required("Required"),
   confirm: Yup.string()
@@ -20,38 +20,55 @@ const Signup = (): JSX.Element => {
 
   const [error, setError] = useState<any>("");
   const [success, setSuccess] = useState<string>("");
+  const [showBiometrics, setShowBiometrics] = useState(false);
+  const [signupData, setSignupData] = useState<any>(null);
+
+  const handleBiometricEnrollment = () => {
+    if (signupData) {
+      const dummyEmail = `${signupData.citizenshipNumber}@voter.local`;
+      axios
+        .post("/auth/signup", {
+          ...signupData,
+          email: dummyEmail,
+        })
+        .then((res) => {
+          setError("");
+          setSuccess("Registration Request Submitted! Please wait for Election Commission approval.");
+          setShowBiometrics(false);
+          setSignupData(null);
+        })
+        .catch((err) => {
+          let error: string = err.message;
+          if (err?.response?.data)
+            error = JSON.stringify(err.response.data);
+          setError(error.slice(0, 50));
+          setShowBiometrics(false);
+        });
+    }
+  };
 
   return (
     <div>
+      {showBiometrics && (
+        <BiometricScanner
+          voterName={signupData?.name}
+          onSuccess={handleBiometricEnrollment}
+          onCancel={() => setShowBiometrics(false)}
+        />
+      )}
       <LoginLayout error={error} success={success}>
         <div className="form-container">
           <Formik
             initialValues={{
               name: "",
-              email: "",
               citizenshipNumber: "",
               password: "",
               confirm: "",
             }}
             validationSchema={schema}
-            onSubmit={({ name, email, citizenshipNumber, password }) => {
-              axios
-                .post("/auth/signup", {
-                  name,
-                  email,
-                  citizenshipNumber,
-                  password,
-                })
-                .then((res) => {
-                  setError("");
-                  setSuccess("Signup Successful!");
-                })
-                .catch((err) => {
-                  let error: string = err.message;
-                  if (err?.response?.data)
-                    error = JSON.stringify(err.response.data);
-                  setError(error.slice(0, 50));
-                });
+            onSubmit={(values) => {
+              setSignupData(values);
+              setShowBiometrics(true);
             }}
           >
             {({ errors, touched, getFieldProps, handleSubmit }) => (
@@ -82,17 +99,7 @@ const Signup = (): JSX.Element => {
                   </div>
                 </div>
 
-                <div className="input-container">
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="Email"
-                    {...getFieldProps("email")}
-                  />
-                  <div className="form-error-text">
-                    {touched.email && errors.email ? errors.email : null}
-                  </div>
-                </div>
+
 
                 <div className="input-container">
                   <input
