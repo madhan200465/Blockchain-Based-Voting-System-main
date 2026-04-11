@@ -13,9 +13,15 @@ const Users = () => {
     const [verifiedUsers, setVerifiedUsers] = useState<User[]>([]);
     const [activeTab, setActiveTab] = useState<"pending" | "registry">("pending");
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
-    const fetchData = async () => {
-        setLoading(true);
+    const fetchData = async (initialLoad = false) => {
+        if (initialLoad) {
+            setLoading(true);
+        } else {
+            setRefreshing(true);
+        }
+
         try {
             const [pendingRes, verifiedRes] = await Promise.all([
                 axios.get("/users/all"),
@@ -26,12 +32,22 @@ const Users = () => {
         } catch (error) {
             console.log({ error });
         } finally {
-            setLoading(false);
+            if (initialLoad) {
+                setLoading(false);
+            }
+
+            setRefreshing(false);
         }
     };
 
     useEffect(() => {
-        fetchData();
+        fetchData(true);
+
+        const interval = setInterval(() => {
+            fetchData(false);
+        }, 15000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const verifyUser = (id: number | string) => {
@@ -68,6 +84,14 @@ const Users = () => {
             <div className="dashboard-header">
                 <h2 className="title-small">Voter Management System</h2>
                 <p className="text-normal">Review registration requests and manage the active voter registry.</p>
+                                <button
+                                    onClick={() => fetchData(false)}
+                                    className="button-secondary"
+                                    style={{ marginTop: '12px', minWidth: '180px' }}
+                                    disabled={refreshing}
+                                >
+                                    {refreshing ? 'Refreshing...' : 'Refresh Requests'}
+                                </button>
             </div>
 
             <div className="tab-navigation" style={{ display: 'flex', gap: '20px', marginBottom: '30px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>

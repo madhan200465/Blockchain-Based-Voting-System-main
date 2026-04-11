@@ -9,7 +9,7 @@ This is a secure, transparent, and decentralized voting system built using block
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
-| **Election Commission** | `admin@test.com` | **`test1234`** |
+| **Election Commission** | `admin@gmail.com` | **`test1234`** |
 | **Verified Voter** | `john1@gmail.com` | **`test1234`** |
 
 Features
@@ -39,6 +39,8 @@ TypeScript: Ensures type safety and maintainable code.
 
 
 Auditability: Transparent vote tracking and verification.
+
+Results Publication Workflow: Election Commission members can review final tallies after voting ends and publish the results to voters only when ready.
 
 Tech Stack
 
@@ -89,3 +91,5 @@ TypeScript (install globally: npm install -g typescript)
 
 
 Git (for cloning the repository)
+
+API endpoints now include a commission publish step at `/polls/publish`, which makes finished election results visible to voters.

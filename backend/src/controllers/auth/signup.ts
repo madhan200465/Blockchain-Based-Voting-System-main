@@ -3,12 +3,20 @@ import * as yup from "yup";
 import { User } from "../../entity/User";
 import bcrypt from "bcrypt";
 
+const emptyStringToUndefined = (value: any, originalValue: any) => {
+  if (typeof originalValue === "string" && originalValue.trim() === "") {
+    return undefined;
+  }
+
+  return value;
+};
+
 const schema = yup.object({
   body: yup.object({
     name: yup.string().min(3).required(),
-    email: yup.string().email().required(),
+    email: yup.string().transform(emptyStringToUndefined).email(),
     password: yup.string().min(3).required(),
-    citizenshipNumber: yup.string().min(4),
+    citizenshipNumber: yup.string().transform(emptyStringToUndefined).min(4).required(),
   }),
 });
 
@@ -31,9 +39,12 @@ export default async (req: Request, res: Response) => {
 
   newUser.admin = false;
   newUser.name = req.body.name;
-  newUser.email = req.body.email;
+  const citizenshipNumber = req.body.citizenshipNumber.trim();
+  const email = req.body.email?.trim() || `${citizenshipNumber}@voter.local`;
+
+  newUser.email = email.toLowerCase();
   newUser.password = hashedPassword;
-  newUser.citizenshipNumber = req.body.citizenshipNumber;
+  newUser.citizenshipNumber = citizenshipNumber;
   newUser.verified = false;
 
   try {

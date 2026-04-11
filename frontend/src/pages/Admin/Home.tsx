@@ -10,6 +10,7 @@ const Home = (props: RouteProps): JSX.Element => {
   const [status, setStatus] = useState<"not-started" | "running" | "finished">(
     "not-started"
   );
+  const [published, setPublished] = useState<boolean>(false);
 
   useEffect(() => {
     setLoading(true);
@@ -17,6 +18,7 @@ const Home = (props: RouteProps): JSX.Element => {
       .get("/polls/status")
       .then((res) => {
         setStatus(res.data.status);
+        setPublished(!!res.data.published);
         setLoading(false);
       })
       .catch((error) => console.log({ error }));
@@ -28,7 +30,14 @@ const Home = (props: RouteProps): JSX.Element => {
     <div className="admin-dashboard-container">
       <div className="dashboard-header">
         <h2 className="title-small">Election Commission Dashboard</h2>
-        <p className="text-normal">Status: <span className={`status-badge ${status}`}>{status}</span></p>
+        <p className="text-normal">
+          Status: <span className={`status-badge ${status}`}>{status}</span>
+          {status === "finished" && (
+            <span style={{ marginLeft: "10px", color: published ? "#14b8a6" : "#f59e0b" }}>
+              {published ? "public" : "review only"}
+            </span>
+          )}
+        </p>
       </div>
 
       <div className="dashboard-content">

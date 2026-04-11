@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import ElectionContract from "../../web3";
 import { User } from "../../entity/User";
+import { getPublicationState } from "../../utils/electionPublication";
+import { buildVoteTally } from "../../utils/voteTally";
 
 export default async (req: Request, res: Response) => {
   const instance = await ElectionContract.deployed();
@@ -10,6 +12,7 @@ export default async (req: Request, res: Response) => {
 
   const candidates = await instance.getCandidates();
   const votes = await instance.getVotes();
+  const publication = await getPublicationState();
 
   // Check if admin to show results
   let isAdmin = false;
@@ -29,33 +32,45 @@ export default async (req: Request, res: Response) => {
   }
 
   if (isAdmin) {
-    const response: any = {};
-    for (let i = 0; i < candidates.length; i++) {
-        response[candidates[i]] = 0;
-    }
-
     const totalVotes = votes.length;
     const totalVerifiedUsers = await User.count({ where: { verified: true } });
     const participationRate = totalVerifiedUsers > 0 ? (totalVotes / totalVerifiedUsers) * 100 : 0;
 
-    for (let i = 0; i < votes.length; i++) {
-      const vote = votes[i];
-      if (typeof response[vote[3]] != "undefined")
-        response[vote[3]] = response[vote[3]] + 1;
-    }
-
     return res.send({
       name,
       description,
-      votes: response,
+      votes: buildVoteTally(candidates, votes),
       analytics: {
         totalVotes,
         totalVerifiedUsers,
         participationRate: participationRate.toFixed(2) + "%"
-      }
+      },
+      published: publication.isPublished,
+      reviewedAt: publication.reviewedAt,
+      publishedAt: publication.publishedAt,
+    });
+  }
+
+  const status = await instance.getStatus();
+
+  if (status === "finished" && !publication.isPublished) {
+    return res.status(403).send("results not published yet");
+  }
+
+  if (status === "finished" && publication.isPublished) {
+    return res.send({
+      name,
+      description,
+      votes: buildVoteTally(candidates, votes),
+      published: true,
     });
   }
 
   // Voters only get names and candidates
-  return res.send({ name, description, candidates });
+  return res.send({
+    name,
+    description,
+    candidates,
+    published: publication.isPublished,
+  });
 };

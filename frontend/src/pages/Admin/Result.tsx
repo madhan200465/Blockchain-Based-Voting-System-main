@@ -5,19 +5,50 @@ import Panel from "../../components/Polls/Panel";
 
 const Result = () => {
   const [loading, setLoading] = useState(true);
+  const [publishing, setPublishing] = useState(false);
   const [data, setData] = useState({
     name: "",
     description: "",
     votes: {},
     analytics: { totalVotes: 0, totalVerifiedUsers: 0, participationRate: "0%" }
   });
+  const [publication, setPublication] = useState({
+    published: false,
+    reviewedAt: "",
+    publishedAt: ""
+  });
+
+  const publishedOn = publication.publishedAt
+    ? new Date(publication.publishedAt).toLocaleString()
+    : "";
 
   useEffect(() => {
-    axios.get("/polls/").then((res) => {
-      setData(res.data);
-      setLoading(false);
-    });
+    Promise.all([axios.get("/polls/"), axios.get("/polls/status")])
+      .then(([pollsRes, statusRes]) => {
+        setData(pollsRes.data);
+        setPublication({
+          published: !!statusRes.data.published,
+          reviewedAt: statusRes.data.reviewedAt || "",
+          publishedAt: statusRes.data.publishedAt || "",
+        });
+      })
+      .finally(() => setLoading(false));
   }, []);
+
+  const publishResults = () => {
+    setPublishing(true);
+    axios
+      .post("/polls/publish")
+      .then((res) => {
+        setPublication({
+          published: !!res.data.published,
+          reviewedAt: res.data.reviewedAt || "",
+          publishedAt: res.data.publishedAt || "",
+        });
+      })
+      .catch((err) => console.log({ err }))
+      .finally(() => setPublishing(false));
+  };
 
   const resetElection = () => {
     if (window.confirm("WARNING: This will permanently wipe all current election data and results. This action cannot be undone. Are you sure?")) {
@@ -35,6 +66,22 @@ const Result = () => {
   return (
     <Panel name={data.name} description={data.description}>
       <>
+        <div className="status-message card-premium" style={{ marginBottom: '25px', textAlign: 'center', padding: '18px' }}>
+          <h4 className="title-small" style={{ marginBottom: '8px' }}>
+            {publication.published ? "Results are public" : "Commission review only"}
+          </h4>
+          <p className="text-normal" style={{ marginBottom: 0 }}>
+            {publication.published
+              ? "Voters can now see the final result summary."
+              : "Only commission members can see the tally until the results are published."}
+          </p>
+          {publication.published && publishedOn && (
+            <p className="text-normal" style={{ marginTop: '8px', opacity: 0.85 }}>
+              Published on: {publishedOn}
+            </p>
+          )}
+        </div>
+
         <div className="analytics-summary">
           <div className="analytics-card">
             <h4>Total Votes</h4>
@@ -59,6 +106,14 @@ const Result = () => {
         <Chart votes={data.votes} />
 
         <div className="dashboard-actions" style={{ marginTop: '30px', textAlign: 'center' }}>
+          <button
+            onClick={publishResults}
+            className="button-secondary"
+            style={{ minWidth: '200px', marginRight: '12px' }}
+            disabled={publishing || publication.published}
+          >
+            {publication.published ? "Results Published" : publishing ? "Publishing..." : "Publish Results"}
+          </button>
           <button
             onClick={resetElection}
             className="end-election-button button-primary"

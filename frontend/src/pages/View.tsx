@@ -5,12 +5,14 @@ import Polls from "./Polls";
 import Result from "./Result";
 import Start from "./Start";
 import Back from "../components/Back";
+import StatusNotice from "../components/Polls/StatusNotice";
 
 const View = (props: RouteProps): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(true);
   const [status, setStatus] = useState<"not-started" | "running" | "finished">(
     "not-started"
   );
+  const [published, setPublished] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -20,6 +22,7 @@ const View = (props: RouteProps): JSX.Element => {
       .get("/polls/status")
       .then((res) => {
         setStatus(res.data.status);
+        setPublished(!!res.data.published);
         setLoading(false);
       })
       .catch((error) => console.log({ error }));
@@ -29,8 +32,16 @@ const View = (props: RouteProps): JSX.Element => {
 
   if (loading) return comp;
 
-  if (status === "finished") comp = <Result />;
+  if (status === "finished" && published) comp = <Result />;
   if (status === "running") comp = <Polls />;
+  if (status === "finished" && !published) {
+    comp = (
+      <StatusNotice
+        title="Results are under review"
+        message="The vote has ended. Results will appear here after the Election Commission publishes them."
+      />
+    );
+  }
   if (status === "not-started") comp = <Start />;
 
   return (

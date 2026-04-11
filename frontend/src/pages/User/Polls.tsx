@@ -4,6 +4,8 @@ import { AuthContext } from "../../contexts/Auth";
 import Waiting from "../../components/Waiting";
 import Panel from "../../components/Polls/Panel";
 import Ballot from "../../components/Polls/Ballot";
+import Chart from "../../components/Polls/Chart";
+import StatusNotice from "../../components/Polls/StatusNotice";
 
 const User = () => {
   const [voteState, setVoteStatus] = useState<
@@ -13,8 +15,11 @@ const User = () => {
   const [data, setData] = useState({ 
     name: "", 
     description: "", 
-    candidates: [] as string[] 
+    candidates: [] as string[],
+    votes: {} as Record<string, number>
   });
+  const [published, setPublished] = useState(false);
+  const [publishedAt, setPublishedAt] = useState("");
   const [votable, setVotable] = useState("");
 
   const authContext = useContext(AuthContext);
@@ -24,38 +29,61 @@ const User = () => {
       .get("/polls/status")
       .then((res: any) => {
         setVoteStatus(res.data.status);
+        setPublished(!!res.data.published);
+        setPublishedAt(res.data.publishedAt || "");
       })
       .catch((error: any) => console.log({ error }));
   }, []);
 
+  const publishedOn = publishedAt ? new Date(publishedAt).toLocaleString() : "";
+
   useEffect(() => {
     if (voteState !== "checking") {
-      axios
-        .get("/polls/")
-        .then((res: any) => {
-          setData(res.data);
+      const requests = [axios.get("/polls/")];
+
+      if (voteState === "running") {
+        requests.push(
+          axios.post("/polls/check-voteability", {
+            id: authContext.id.toString(),
+          })
+        );
+      }
+
+      Promise.all(requests)
+        .then((responses) => {
+          setData(responses[0].data);
+
+          if (responses[1]) {
+            setVotable(responses[1].data);
+          }
         })
         .catch((err: any) => {
+          if (voteState === "finished" && !published) {
+            return;
+          }
+
           console.error("Failed to fetch poll data:", err);
         })
         .finally(() => {
           setLoading(false);
         });
-
-      axios
-        .post("/polls/check-voteability", {
-          id: authContext.id.toString(),
-        })
-        .then((res: any) => {
-          setVotable(res.data);
-        })
-        .catch((err: any) => console.log(err));
     }
-  }, [voteState, authContext.id]);
+  }, [voteState, authContext.id, published]);
 
   if (loading || voteState === "checking") return <div className="loading-state">Syncing Ballot...</div>;
 
   if (voteState === "not-started") return <Waiting />;
+
+  if (voteState === "finished" && !published) {
+    return (
+      <Panel name="Results under review" description="The commission has ended voting and is verifying the tally before publication.">
+        <StatusNotice
+          title="Results are not public yet"
+          message="Voting has finished. The Election Commission must publish the final results before voters can view them."
+        />
+      </Panel>
+    );
+  }
 
   return (
     <Panel name={data.name} description={data.description}>
@@ -68,13 +96,16 @@ const User = () => {
             candidates={data.candidates}
           />
         ) : (
-          <div className="status-message card-premium" style={{ textAlign: 'center', padding: '40px' }}>
-            <i className="bi bi-clock-history" style={{ fontSize: '3rem', color: '#6366f1', marginBottom: '20px', display: 'block' }}></i>
-            <h3 className="title-small">Election Concluded</h3>
-            <p className="text-normal">
-              Voting has ended for this election. Final results are being verified by the Election Commission.
-            </p>
-          </div>
+          <>
+            {publishedOn && (
+              <div className="status-message card-premium" style={{ marginBottom: '20px', textAlign: 'center', padding: '14px' }}>
+                <p className="text-normal" style={{ marginBottom: 0 }}>
+                  Published on: {publishedOn}
+                </p>
+              </div>
+            )}
+            <Chart votes={data.votes} />
+          </>
         )}
       </>
     </Panel>

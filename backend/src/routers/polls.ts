@@ -6,6 +6,7 @@ import statusController from "../controllers/polls/status";
 import endController from "../controllers/polls/end";
 import resetController from "../controllers/polls/reset";
 import votesController from "../controllers/polls/votes";
+import publishController from "../controllers/polls/publish";
 import voteController, { checkVoteability } from "../controllers/polls/vote";
 import { adminOnly } from "../middlewares/auth";
 
@@ -18,6 +19,7 @@ router.get("/votes", adminOnly, votesController);
 router.post("/start", adminOnly, startController);
 router.post("/end", adminOnly, endController);
 router.post("/reset", adminOnly, resetController);
+router.post("/publish", adminOnly, publishController);
 router.post("/check-voteability", checkVoteability);
 router.post("/vote", voteController);
 

@@ -5,10 +5,18 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 
+const emptyStringToUndefined = (value: any, originalValue: any) => {
+  if (typeof originalValue === "string" && originalValue.trim() === "") {
+    return undefined;
+  }
+
+  return value;
+};
+
 const schema = yup.object({
   body: yup.object({
-    email: yup.string().email(),
-    voterId: yup.string(),
+    email: yup.string().transform(emptyStringToUndefined).email(),
+    voterId: yup.string().transform(emptyStringToUndefined),
     password: yup.string().min(3).required(),
   }),
 });
@@ -24,6 +32,7 @@ export default async (req: Request, res: Response) => {
 
   const { email, voterId, password } = req.body;
   const trimmedEmail = email?.trim();
+  const normalizedEmail = trimmedEmail?.toLowerCase();
   const trimmedVoterId = voterId?.trim();
 
   if (!trimmedEmail && !trimmedVoterId) {
@@ -33,11 +42,13 @@ export default async (req: Request, res: Response) => {
   try {
     if (trimmedVoterId) {
       user = await User.findOneOrFail({ citizenshipNumber: trimmedVoterId });
+    } else if (normalizedEmail) {
+      user = await User.findOneOrFail({ email: normalizedEmail });
     } else {
-      user = await User.findOneOrFail({ email: trimmedEmail });
+      return res.status(400).send("Email or Voter ID is required");
     }
   } catch (error: any) {
-    return res.status(404).send("User not found");
+    return res.status(404).send("No account found for the provided Email or Voter ID");
   }
 
   const match = await bcrypt.compare(req.body.password, user.password);

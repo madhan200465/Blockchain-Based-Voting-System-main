@@ -15,20 +15,24 @@ interface LoginProps extends RouteProps {
 const Login = (props: RouteProps & LoginProps): JSX.Element => {
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
+  const isAdminMode = props.type === "admin";
+  const isVoterMode = props.type === "voter";
+  const isMixedMode = !isAdminMode && !isVoterMode;
 
   const [error, setError] = useState<any>("");
   const [showBiometrics, setShowBiometrics] = useState(false);
   const [tempAuthData, setTempAuthData] = useState<any>(null);
 
   const loginSchema = Yup.object().shape({
-    email: props.type === "admin" ? Yup.string().email("Invalid email").required("Required") : Yup.string(),
-    voterId: props.type === "voter" ? Yup.string().required("Required") : Yup.string(),
+    email: isAdminMode ? Yup.string().email("Invalid email").required("Required") : Yup.string(),
+    voterId: isVoterMode ? Yup.string().required("Required") : Yup.string(),
+    credential: isMixedMode ? Yup.string().trim().required("Required") : Yup.string(),
     password: Yup.string().min(3).required("Required"),
   });
 
   const handleBiometricSuccess = () => {
     if (tempAuthData) {
-      if (props.type === "voter" && !tempAuthData.user.verified) {
+      if ((isVoterMode || isMixedMode) && !tempAuthData.user.verified) {
         setError("Account Pending Approval: Please contact the Election Commission for verification.");
         setShowBiometrics(false);
         return;
@@ -50,27 +54,52 @@ const Login = (props: RouteProps & LoginProps): JSX.Element => {
       <LoginLayout error={error}>
         <div className="form-container">
           <div className="title-small" style={{ marginBottom: "20px", textAlign: "center" }}>
-            {props.type === "admin" ? "Election Commission Portal" : "Voter Portal"}
+            {isAdminMode ? "Election Commission Portal" : isVoterMode ? "Voter Portal" : "Secure Login Portal"}
           </div>
           <Formik
             initialValues={{
               email: "",
               voterId: "",
+              credential: "",
               password: "",
             }}
             validationSchema={loginSchema}
             onSubmit={(values) => {
               setError(""); // Clear previous errors
+              const credential = values.credential.trim();
+              const payload =
+                isAdminMode
+                  ? {
+                      email: values.email.trim(),
+                      password: values.password,
+                    }
+                  : isVoterMode
+                  ? {
+                      voterId: values.voterId.trim(),
+                      password: values.password,
+                    }
+                  : credential.includes("@")
+                  ? {
+                      email: credential,
+                      password: values.password,
+                    }
+                  : {
+                      voterId: credential,
+                      password: values.password,
+                    };
+
               axios
-                .post("/auth/login", { ...values })
+                .post("/auth/login", payload)
                 .then((res) => {
                   // Role check for security
-                  if (props.type === "admin" && !res.data.user.admin) {
-                    setError("Unauthorized: This portal is for Commission Members only.");
+                  if (isAdminMode && !res.data.user.admin) {
+                    setError("This account is a voter account. Redirecting to Voter Portal...");
+                    setTimeout(() => navigate("/login/voter"), 800);
                     return;
                   }
-                  if (props.type === "voter" && res.data.user.admin) {
-                    setError("Unauthorized: Please use the Commission Portal.");
+                  if (isVoterMode && res.data.user.admin) {
+                    setError("This account is a Commission account. Redirecting to Commission Portal...");
+                    setTimeout(() => navigate("/login/admin"), 800);
                     return;
                   }
 
@@ -95,25 +124,34 @@ const Login = (props: RouteProps & LoginProps): JSX.Element => {
             {({ errors, touched, getFieldProps, handleSubmit }) => (
               <form onSubmit={handleSubmit}>
                 <div className="input-container">
-                  {props.type === "admin" ? (
+                  {isAdminMode ? (
                     <input
                       id="email"
                       type="email"
                       placeholder="Email"
                       {...getFieldProps("email")}
                     />
-                  ) : (
+                  ) : isVoterMode ? (
                     <input
                       id="voterId"
                       type="text"
                       placeholder="Voter ID (Citizenship Number)"
                       {...getFieldProps("voterId")}
                     />
+                  ) : (
+                    <input
+                      id="credential"
+                      type="text"
+                      placeholder="Email or Voter ID"
+                      {...getFieldProps("credential")}
+                    />
                   )}
                   <div className="form-error-text">
-                    {props.type === "admin"
+                    {isAdminMode
                       ? (touched.email && errors.email ? errors.email : null)
-                      : (touched.voterId && errors.voterId ? errors.voterId : null)
+                      : isVoterMode
+                      ? (touched.voterId && errors.voterId ? errors.voterId : null)
+                      : (touched.credential && errors.credential ? errors.credential : null)
                     }
                   </div>
                 </div>
@@ -133,13 +171,13 @@ const Login = (props: RouteProps & LoginProps): JSX.Element => {
                 </div>
 
                 <button className="login-button button-primary" type="submit">
-                  {props.type === "admin" ? "Verify & Enter" : "Login"}
+                  {isAdminMode ? "Verify & Enter" : "Login"}
                 </button>
               </form>
             )}
           </Formik>
 
-          {props.type !== "admin" && (
+          {!isAdminMode && (
             <>
               <hr />
               <button

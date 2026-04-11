@@ -54,7 +54,7 @@ echo ✨ SUCCESS: All services are launching!
 echo ============================================================
 echo.
 echo 🔐 REGISTERED ACCOUNTS:
-echo 👔 ADMIN (Commission):  admin@test.com
+echo 👔 ADMIN (Commission):  admin@gmail.com
 echo 👤 VOTER (Registered):  john1@gmail.com
 echo 🔑 PASSWORD (ALL):      test1234
 echo.

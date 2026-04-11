@@ -9,9 +9,9 @@ type UserType = {
 
 const users: UserType[] = [
   {
-    name: "John",
+    name: "Admin",
     citizenshipNumber: "9860777906",
-    email: "john@gmail.com",
+    email: "admin@gmail.com",
     password: "$2b$10$6sdkothEwAguhA0FytsGF.gcWPmTDB5hosif6rGX5FFJK8PdBgRHu",
     admin: true,
     verified: true,

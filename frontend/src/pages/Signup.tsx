@@ -25,7 +25,7 @@ const Signup = (): JSX.Element => {
 
   const handleBiometricEnrollment = () => {
     if (signupData) {
-      const dummyEmail = `${signupData.citizenshipNumber}@voter.local`;
+      const dummyEmail = `${String(signupData.citizenshipNumber).trim().toLowerCase()}@voter.local`;
       axios
         .post("/auth/signup", {
           ...signupData,

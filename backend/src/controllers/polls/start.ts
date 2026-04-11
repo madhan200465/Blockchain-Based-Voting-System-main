@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
 import ElectionContract, { web3 } from "../../web3";
+import { initializePublicationState } from "../../utils/electionPublication";
 
 const schema = yup.object({
   body: yup.object({
@@ -40,6 +41,8 @@ export default async (req: Request, res: Response) => {
       from: accounts[0],
     });
   }
+
+  await initializePublicationState();
 
   return res.send(req.body);
 };
