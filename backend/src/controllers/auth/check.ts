@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
+import { User } from "../../entity/User";
 
 export default async (req: Request, res: Response) => {
   const refreshToken = req.cookies.refreshToken;
@@ -25,14 +26,20 @@ export default async (req: Request, res: Response) => {
     }
 
     const user: any = jwt.verify(refreshToken, refreshTokenSecret);
+    const userFromDb = await User.findOne({ where: { id: user.id } });
+
+    if (!userFromDb) {
+      return res.status(400).send("not authenticated");
+    }
 
     const userPlainObj = {
-      id: user.id,
-      name: user.name,
-      citizenshipNumber: user.citizenshipNumber,
-      email: user.email,
-      admin: user.admin,
-      verified: user.verified,
+      id: userFromDb.id,
+      name: userFromDb.name,
+      citizenshipNumber: userFromDb.citizenshipNumber,
+      voterId: userFromDb.voterId,
+      email: userFromDb.email,
+      admin: userFromDb.admin,
+      verified: userFromDb.verified,
     };
 
     const accessToken = jwt.sign(userPlainObj, accessTokenSecret, {

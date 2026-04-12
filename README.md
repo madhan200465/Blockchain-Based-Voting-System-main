@@ -93,3 +93,11 @@ TypeScript (install globally: npm install -g typescript)
 Git (for cloning the repository)
 
 API endpoints now include a commission publish step at `/polls/publish`, which makes finished election results visible to voters.
+
+## Postman API Testing
+
+Ready-to-import Postman files are available in the `postman/` folder:
+
+- `postman/BBVS-API.postman_collection.json`
+- `postman/BBVS-Local.postman_environment.json`
+- `postman/README.md` (step-by-step usage and recommended run order)

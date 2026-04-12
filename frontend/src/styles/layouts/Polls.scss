@@ -1,5 +1,6 @@
 .polls-wrapper {
   @include boxes-wrapper;
+  padding-bottom: 20px;
 
   .poll-wrapper {
     @include box-wrapper;

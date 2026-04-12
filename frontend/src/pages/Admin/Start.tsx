@@ -68,6 +68,8 @@ const Start = () => {
                 setError(error.slice(0, 50));
                 setLoading(false);
               });
+          } else {
+            setLoading(false);
           }
         }}
       >
@@ -109,8 +111,7 @@ const Start = () => {
                     <span
                       onClick={() => {
                         const newList = [...candidates];
-                        const i = newList.indexOf({ name, info });
-                        newList.splice(i, 1);
+                        newList.splice(index, 1);
 
                         setCandidates(newList);
                       }}
@@ -135,8 +136,8 @@ const Start = () => {
                 />
 
                 <button
-                  className=""
                   type="button"
+                  disabled={loading}
                   onClick={() => {
                     const newCandidate = { name, info };
                     setCandidates([...candidates, newCandidate]);
@@ -164,8 +165,8 @@ const Start = () => {
               </div>
             </div>
 
-            <button className="login-button button-primary" type="submit">
-              Start Election
+            <button className="login-button button-primary" type="submit" disabled={loading}>
+              {loading ? "Starting..." : "Start Election"}
             </button>
           </form>
         )}

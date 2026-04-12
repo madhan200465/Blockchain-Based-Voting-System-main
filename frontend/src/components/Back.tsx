@@ -2,17 +2,24 @@ import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
 
 interface BackProps {
-  call: (any: any) => any;
+  call: () => void;
+  label?: string;
+  ariaLabel?: string;
 }
 
 const Back = (props: BackProps) => {
   return (
-    <div onClick={props.call} className="back title-small">
+    <button
+      type="button"
+      onClick={props.call}
+      className="back"
+      aria-label={props.ariaLabel || props.label || "Back to dashboard"}
+    >
       <span className="icon">
         <IoIosArrowBack />
       </span>
-      BACK
-    </div>
+      {props.label || "Back to Dashboard"}
+    </button>
   );
 };
 

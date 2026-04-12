@@ -6,7 +6,11 @@ import StatusNotice from "../components/Polls/StatusNotice";
 
 const Result = () => {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState({ name: "", description: "", votes: {} });
+  const [data, setData] = useState({
+    name: "",
+    description: "",
+    votes: {} as Record<string, number>,
+  });
   const [published, setPublished] = useState(false);
   const [publishedAt, setPublishedAt] = useState("");
 
@@ -34,15 +38,25 @@ const Result = () => {
     );
 
   const publishedOn = publishedAt ? new Date(publishedAt).toLocaleString() : "";
+  const totalVotes = Object.values(data.votes || {}).reduce(
+    (sum, count) => sum + (Number(count) || 0),
+    0
+  );
+  const candidateCount = Object.keys(data.votes || {}).length;
 
   return (
     <Panel name={data.name} description={data.description}>
       <>
         {publishedOn && (
-          <div className="status-message card-premium" style={{ marginBottom: '20px', textAlign: 'center', padding: '14px' }}>
-            <p className="text-normal" style={{ marginBottom: 0 }}>
-              Published on: {publishedOn}
-            </p>
+          <div className="published-result-banner card-premium">
+            <div className="published-result-main">
+              <h4 className="title-small">Public Result Release</h4>
+              <p className="text-normal">Published on: {publishedOn}</p>
+            </div>
+            <div className="published-result-stats">
+              <span className="result-stat-pill">{totalVotes} Total Votes</span>
+              <span className="result-stat-pill">{candidateCount} Candidates</span>
+            </div>
           </div>
         )}
         <Chart votes={data.votes} />

@@ -36,6 +36,11 @@ const User = () => {
   }, []);
 
   const publishedOn = publishedAt ? new Date(publishedAt).toLocaleString() : "";
+  const totalVotes = Object.values(data.votes || {}).reduce(
+    (sum, count) => sum + (Number(count) || 0),
+    0
+  );
+  const candidateCount = Object.keys(data.votes || {}).length;
 
   useEffect(() => {
     if (voteState !== "checking") {
@@ -93,15 +98,21 @@ const User = () => {
             enableVote={votable === "not-voted"}
             userId={authContext.id}
             userName={authContext.name}
+            voterId={authContext.voterId}
             candidates={data.candidates}
           />
         ) : (
           <>
             {publishedOn && (
-              <div className="status-message card-premium" style={{ marginBottom: '20px', textAlign: 'center', padding: '14px' }}>
-                <p className="text-normal" style={{ marginBottom: 0 }}>
-                  Published on: {publishedOn}
-                </p>
+              <div className="published-result-banner card-premium">
+                <div className="published-result-main">
+                  <h4 className="title-small">Official Result Bulletin</h4>
+                  <p className="text-normal">Published on: {publishedOn}</p>
+                </div>
+                <div className="published-result-stats">
+                  <span className="result-stat-pill">{totalVotes} Total Votes</span>
+                  <span className="result-stat-pill">{candidateCount} Candidates</span>
+                </div>
               </div>
             )}
             <Chart votes={data.votes} />

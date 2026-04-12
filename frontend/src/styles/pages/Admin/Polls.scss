@@ -1,3 +1,102 @@
 .end-election-button {
-  margin-top: 50px;
+  margin-top: 0;
+}
+
+.admin-dashboard-container {
+  @include glass;
+  @include box-shadow;
+  padding: 32px;
+  border-radius: 24px;
+  max-width: 1280px;
+  margin: 40px auto 0;
+
+  .dashboard-header {
+    margin-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 110px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-left: 0;
+      color: $text-light;
+      background: rgba(255, 255, 255, 0.06);
+
+      &.running {
+        background: rgba(24, 194, 156, 0.14);
+        color: #8ff2d7;
+      }
+
+      &.finished {
+        background: rgba(109, 124, 255, 0.14);
+        color: #dce3ff;
+      }
+
+      &.not-started {
+        background: rgba(245, 158, 11, 0.14);
+        color: #ffd59b;
+      }
+    }
+  }
+
+  .dashboard-content {
+    display: grid;
+    gap: 24px;
+  }
+}
+
+.publication-note {
+  font-weight: 600;
+
+  &.published {
+    color: $theme-accent;
+  }
+
+  &.review-only {
+    color: #f59e0b;
+  }
+}
+
+.dashboard-actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  button {
+    min-width: 200px;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-dashboard-container {
+    padding: 22px 16px;
+    margin-top: 24px;
+  }
+
+  .dashboard-actions {
+    button {
+      min-width: 140px;
+      flex: 1 1 0;
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import axios from "../axios";
 
@@ -11,6 +11,7 @@ type User = {
   name: string;
   email: string;
   citizenshipNumber: string;
+  voterId: string | null;
   admin: boolean;
   verified: boolean;
 };
@@ -20,6 +21,7 @@ export const AuthContext = createContext({
   name: "",
   email: "",
   citizenshipNumber: "",
+  voterId: "",
   isAdmin: false,
   isVerified: false,
   authenticated: false,
@@ -29,7 +31,7 @@ export const AuthContext = createContext({
   logout: () => { },
 });
 
-export default (props: ContextProps): JSX.Element => {
+const AuthProvider = (props: ContextProps): JSX.Element => {
   const navigate = useNavigate();
 
   const [authentication, setAuthentication] = useState({
@@ -37,6 +39,7 @@ export default (props: ContextProps): JSX.Element => {
     name: "",
     email: "",
     citizenshipNumber: "",
+    voterId: "",
     isAdmin: false,
     isVerified: false,
     authenticated: false,
@@ -44,25 +47,7 @@ export default (props: ContextProps): JSX.Element => {
     loading: true,
   });
 
-  const checkAuthentication = () => {
-    axios
-      .post("/auth/check")
-      .then((res) => authenticate(res.data.user, res.data.accessToken, false))
-      .catch((error) => {
-        console.log(error);
-        setAuthentication((prev) => ({ ...prev, loading: false }));
-      });
-  };
-
-  useEffect(() => {
-    checkAuthentication();
-
-    const interval = setInterval(checkAuthentication, 30 * 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const authenticate = (
+  const authenticate = useCallback((
     user: User,
     token: string,
     redirect: boolean = true
@@ -75,6 +60,7 @@ export default (props: ContextProps): JSX.Element => {
       name: user.name,
       email: user.email,
       citizenshipNumber: user.citizenshipNumber,
+      voterId: user.voterId || "",
       isAdmin: user.admin,
       isVerified: user.verified,
       authenticated: true,
@@ -83,9 +69,27 @@ export default (props: ContextProps): JSX.Element => {
     });
 
     if (redirect) navigate("/");
-  };
+  }, [navigate]);
 
-  const logout = async () => {
+  const checkAuthentication = useCallback(() => {
+    axios
+      .post("/auth/check")
+      .then((res) => authenticate(res.data.user, res.data.accessToken, false))
+      .catch((error) => {
+        console.log(error);
+        setAuthentication((prev) => ({ ...prev, loading: false }));
+      });
+  }, [authenticate]);
+
+  useEffect(() => {
+    checkAuthentication();
+
+    const interval = setInterval(checkAuthentication, 30 * 1000);
+
+    return () => clearInterval(interval);
+  }, [checkAuthentication]);
+
+  const logout = useCallback(async () => {
     await axios.post("/auth/logout");
 
     // Clear axios header
@@ -96,6 +100,7 @@ export default (props: ContextProps): JSX.Element => {
       name: "",
       email: "",
       citizenshipNumber: "",
+      voterId: "",
       isAdmin: false,
       isVerified: false,
       authenticated: false,
@@ -104,7 +109,7 @@ export default (props: ContextProps): JSX.Element => {
     });
 
     navigate("/");
-  };
+  }, [navigate]);
 
   return (
     <AuthContext.Provider
@@ -113,6 +118,7 @@ export default (props: ContextProps): JSX.Element => {
         name: authentication.name,
         email: authentication.email,
         citizenshipNumber: authentication.citizenshipNumber,
+        voterId: authentication.voterId,
         isAdmin: authentication.isAdmin,
         isVerified: authentication.isVerified,
         authenticated: authentication.authenticated,
@@ -126,3 +132,5 @@ export default (props: ContextProps): JSX.Element => {
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;

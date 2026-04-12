@@ -1,9 +1,10 @@
 .polls-container {
   @include glass;
-  margin-top: 40px;
+  width: min(100%, 1180px);
+  margin: 40px auto 0;
   text-align: center;
-  padding: 48px;
-  border-radius: 20px;
+  padding: 44px;
+  border-radius: 24px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -13,11 +14,136 @@
   h1 {
     font-weight: 800;
     margin-bottom: 2rem;
-    color: $theme-primary;
+    color: $text-light;
   }
 
   .votes-wrapper {
     padding-top: 40px;
     width: 100%;
+  }
+
+  .panel-header {
+    margin-bottom: 30px;
+    padding: 30px;
+    text-align: center;
+
+    .header-icon {
+      font-size: 2.5rem;
+      color: $theme-primary;
+      margin-bottom: 15px;
+    }
+
+    .title-large {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      margin-bottom: 10px;
+    }
+
+    .text-normal {
+      max-width: 820px;
+      margin: 0 auto;
+      font-size: 1.04rem;
+      opacity: 0.85;
+    }
+  }
+
+  .panel-content {
+    width: 100%;
+  }
+}
+
+.status-message {
+  text-align: center;
+  padding: 40px;
+
+  .title-small {
+    margin-bottom: 8px;
+  }
+
+  .text-normal {
+    margin-bottom: 0;
+  }
+}
+
+.status-message-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.status-message-compact {
+  padding: 16px 18px;
+  margin-bottom: 22px;
+
+  .muted-meta {
+    margin-top: 8px;
+    opacity: 0.85;
+  }
+}
+
+.published-result-banner {
+  margin-bottom: 24px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  text-align: left;
+
+  .published-result-main {
+    .title-small {
+      margin-bottom: 6px;
+    }
+
+    .text-normal {
+      margin: 0;
+    }
+  }
+
+  .published-result-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .result-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(109, 124, 255, 0.28);
+    background: rgba(109, 124, 255, 0.14);
+    color: #dce3ff;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+@media (max-width: 768px) {
+  .polls-container {
+    width: 100%;
+    padding: 26px 18px;
+
+    .panel-header {
+      padding: 20px 16px;
+    }
+  }
+
+  .status-message {
+    padding: 28px 18px;
+  }
+
+  .published-result-banner {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .published-result-stats {
+      justify-content: flex-start;
+      width: 100%;
+    }
   }
 }

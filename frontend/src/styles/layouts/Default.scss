@@ -1,76 +1,159 @@
 .default-container {
   min-height: 100vh;
   display: flex;
-  background-color: $theme-bg;
+  background: transparent;
+  position: relative;
+  overflow-x: clip;
 
-  .default-sidebar-container {
-    width: 80px;
+  .default-sidebar {
+    @include glass;
+    position: fixed;
+    z-index: 50;
+    left: 18px;
+    top: 18px;
+    bottom: 18px;
+    width: 280px;
+    border-radius: 26px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    transition: transform 0.35s ease, opacity 0.35s ease;
 
-    .hamburger {
-      font-size: 1.8rem;
-      color: $text-light;
-      padding: 24px;
-      cursor: pointer;
-      transition: color 0.3s ease;
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid $border-soft;
 
-      &:hover {
-        color: $theme-primary;
+      .brand-name {
+        color: $text-light;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+      }
+
+      .brand-subtitle {
+        color: $text-muted;
+        font-size: 0.84rem;
       }
     }
 
-    .default-sidebar {
-      @include glass;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      height: 100vh;
-      width: 280px;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      color: $text-light;
-      padding: 0;
+    .sidebar-links {
       display: flex;
       flex-direction: column;
+      gap: 10px;
+    }
 
-      .hamburger {
-        font-size: 1.8rem;
+    .default-sidebar-link {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      padding: 14px 16px;
+      text-transform: none;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border-radius: 14px;
+      color: $text-muted;
+      margin-right: 0;
+
+      &:hover {
         color: $text-light;
-        margin-bottom: 2rem;
+        background: rgba(255, 255, 255, 0.05);
       }
 
-      .default-sidebar-link {
-        padding: 16px 24px;
-        text-transform: uppercase;
-        font-weight: 500;
-        letter-spacing: 0.05em;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border-left: 3px solid transparent;
-        color: $text-muted;
-
-        &:hover {
-          color: $text-light;
-          background: rgba(255, 255, 255, 0.03);
-          padding-left: 30px;
-        }
-
-        &.active {
-          color: $theme-primary;
-          background: rgba(99, 102, 241, 0.1);
-          border-left: 3px solid $theme-primary;
-        }
+      &.active {
+        color: $text-light;
+        background: linear-gradient(135deg, rgba(109, 124, 255, 0.18), rgba(24, 194, 156, 0.12));
+        border: 1px solid rgba(109, 124, 255, 0.18);
       }
     }
+  }
+
+  .hamburger {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 55;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: rgba(10, 16, 28, 0.85);
+    border: 1px solid $border-soft;
+    color: $text-light;
+    font-size: 1.4rem;
+    padding: 0;
+    margin: 0;
+  }
+
+  .default-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    border: 0;
+    background: rgba(3, 7, 18, 0.42);
+    backdrop-filter: blur(4px);
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+
+    &.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  .default-content-shell {
+    flex: 1;
+    margin-left: 0;
+    width: auto;
+    min-width: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px 24px 32px;
   }
 
   .default-content {
     position: relative;
     flex: 1;
-    padding: 40px;
+    padding: 0 0 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
-    animation: fadeInScale 0.6s ease-out;
+    animation: fadeInScale 0.5s ease-out;
+  }
+
+  .default-frame {
+    width: min(100%, var(--app-content-max));
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .default-panel {
+    width: 100%;
+    min-height: calc(100vh - 140px);
+  }
+
+  .default-frame .back {
+    align-self: flex-start;
+  }
+
+  .default-content-shell > .site-navbar {
+    width: min(100%, var(--app-content-max));
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -80,4 +163,51 @@
 
 .hide {
   transform: translateX(-100%);
+}
+
+@media (max-width: 1200px) {
+  .default-container {
+    .default-sidebar {
+      transform: translateX(-110%);
+    }
+
+    .default-content-shell {
+      width: 100%;
+      padding-inline: 24px;
+    }
+
+    .hamburger {
+      display: grid;
+    }
+
+    .default-backdrop {
+      display: block;
+    }
+
+    .default-sidebar.display {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .default-sidebar.hide {
+      transform: translateX(-110%);
+      opacity: 0;
+    }
+
+    .default-content {
+      padding-inline: 0;
+    }
+
+    .site-navbar {
+      margin-inline: 0;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .default-container {
+    .default-content-shell {
+      padding-inline: 12px;
+    }
+  }
 }

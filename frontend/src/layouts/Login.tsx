@@ -16,9 +16,27 @@ const Login = (props: LayoutProps) => {
       <div className="left">
         <BackButton call={() => navigate("/")} />
 
-        <div className="title-large title-green">Blockchain Based</div>
-        <div className="title-large title-green">Voting System</div>
-        <div className="title-small">the future of voting</div>
+        <div className="title-small">Secure access layer</div>
+        <div className="title-large">Blockchain Based</div>
+        <div className="title-large">Voting System</div>
+        <p className="text-normal login-copy">
+          Designed for verified voting, auditability, and a clear separation between voter and commission workflows.
+        </p>
+
+        <div className="login-highlights">
+          <div>
+            <strong>Immutable</strong>
+            <span>Election records</span>
+          </div>
+          <div>
+            <strong>Verified</strong>
+            <span>Identity checks</span>
+          </div>
+          <div>
+            <strong>Auditable</strong>
+            <span>Live result flow</span>
+          </div>
+        </div>
       </div>
 
       <div className="right">
@@ -40,7 +58,9 @@ const Login = (props: LayoutProps) => {
           </div>
         ) : null}
 
-        <div>{props.children}</div>
+        <div className="auth-panel">
+          {props.children}
+        </div>
       </div>
     </div>
   );

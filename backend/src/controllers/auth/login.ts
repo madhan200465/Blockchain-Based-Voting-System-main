@@ -34,6 +34,7 @@ export default async (req: Request, res: Response) => {
   const trimmedEmail = email?.trim();
   const normalizedEmail = trimmedEmail?.toLowerCase();
   const trimmedVoterId = voterId?.trim();
+  const normalizedVoterId = trimmedVoterId?.toUpperCase();
 
   if (!trimmedEmail && !trimmedVoterId) {
     return res.status(400).send("Email or Voter ID is required");
@@ -41,11 +42,34 @@ export default async (req: Request, res: Response) => {
 
   try {
     if (trimmedVoterId) {
-      user = await User.findOneOrFail({ citizenshipNumber: trimmedVoterId });
+      user = await User.findOne({ where: { voterId: normalizedVoterId } });
+
+      if (!user) {
+        user = await User.findOne({ where: { citizenshipNumber: trimmedVoterId } });
+      }
+
+      // Backward compatibility: some records may only have voter-style values in email.
+      if (!user) {
+        user = await User.findOne({ where: { email: trimmedVoterId.toLowerCase() } });
+      }
+
+      // Support auto-generated voter emails for users entering only citizenship number.
+      if (!user) {
+        user = await User.findOne({ where: { email: `${trimmedVoterId.toLowerCase()}@voter.local` } });
+      }
     } else if (normalizedEmail) {
-      user = await User.findOneOrFail({ email: normalizedEmail });
+      user = await User.findOne({ where: { email: normalizedEmail } });
+
+      // Backward compatibility: allow login when email-like value was stored as citizenship number.
+      if (!user) {
+        user = await User.findOne({ where: { citizenshipNumber: trimmedEmail } });
+      }
     } else {
       return res.status(400).send("Email or Voter ID is required");
+    }
+
+    if (!user) {
+      return res.status(404).send("No account found for the provided Email or Voter ID");
     }
   } catch (error: any) {
     return res.status(404).send("No account found for the provided Email or Voter ID");
@@ -62,6 +86,7 @@ export default async (req: Request, res: Response) => {
               id: user.id,
               name: user.name,
               citizenshipNumber: user.citizenshipNumber,
+          voterId: user.voterId,
               email: user.email,
               verified: false
           },
@@ -93,6 +118,7 @@ export default async (req: Request, res: Response) => {
     id: user.id,
     name: user.name,
     citizenshipNumber: user.citizenshipNumber,
+    voterId: user.voterId,
     email: user.email,
     admin: user.admin,
     verified: user.verified,

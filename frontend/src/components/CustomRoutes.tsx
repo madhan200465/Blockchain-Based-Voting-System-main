@@ -11,21 +11,12 @@ import Default from "../layouts/Default";
 import AdminUsersPage from "../pages/Admin/Users";
 import AdminVerifyPage from "../pages/Admin/Verify";
 
-export default () => {
+const CustomRoutes = () => {
   const authContext = useContext(AuthContext);
 
   const getRoutes = (): JSX.Element => {
     if (authContext.loading) return (
-      <div style={{ 
-        display: 'flex', 
-        height: '100vh', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: '#0f172a',
-        color: '#6366f1',
-        fontSize: '1.5rem',
-        fontWeight: 'bold'
-      }}>
+      <div className="boot-loading-state">
         Initializing Voting System...
       </div>
     );
@@ -83,3 +74,5 @@ export default () => {
 
   return getRoutes();
 };
+
+export default CustomRoutes;

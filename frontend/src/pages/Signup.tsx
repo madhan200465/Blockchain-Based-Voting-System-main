@@ -25,12 +25,10 @@ const Signup = (): JSX.Element => {
 
   const handleBiometricEnrollment = () => {
     if (signupData) {
-      const dummyEmail = `${String(signupData.citizenshipNumber).trim().toLowerCase()}@voter.local`;
+      setError("");
+      setSuccess("");
       axios
-        .post("/auth/signup", {
-          ...signupData,
-          email: dummyEmail,
-        })
+        .post("/auth/signup", signupData)
         .then((res) => {
           setError("");
           setSuccess("Registration Request Submitted! Please wait for Election Commission approval.");
@@ -38,10 +36,40 @@ const Signup = (): JSX.Element => {
           setSignupData(null);
         })
         .catch((err) => {
-          let error: string = err.message;
-          if (err?.response?.data)
-            error = JSON.stringify(err.response.data);
-          setError(error.slice(0, 50));
+          const responseData = err?.response?.data;
+          let message = "Registration failed. Please check your details and try again.";
+
+          const toFriendlyMessage = (raw: string) => {
+            const lower = raw.toLowerCase();
+
+            if (lower.includes("body.email") && lower.includes("valid email")) {
+              return "Please enter a valid email address.";
+            }
+            if (lower.includes("body.name")) {
+              return "Please enter your full name (minimum 3 characters).";
+            }
+            if (lower.includes("body.citizenshipnumber")) {
+              return "Please enter a valid citizenship number (minimum 4 characters).";
+            }
+            if (lower.includes("body.password")) {
+              return "Password must be at least 3 characters.";
+            }
+
+            return raw;
+          };
+
+          if (Array.isArray(responseData) && responseData.length > 0) {
+            message = toFriendlyMessage(String(responseData[0]));
+          } else if (typeof responseData === "string" && responseData.trim() !== "") {
+            message = toFriendlyMessage(responseData);
+          } else if (responseData?.message) {
+            message = toFriendlyMessage(String(responseData.message));
+          } else if (err?.message) {
+            message = String(err.message);
+          }
+
+          setSuccess("");
+          setError(message.slice(0, 120));
           setShowBiometrics(false);
         });
     }
@@ -67,6 +95,8 @@ const Signup = (): JSX.Element => {
             }}
             validationSchema={schema}
             onSubmit={(values) => {
+              setError("");
+              setSuccess("");
               setSignupData(values);
               setShowBiometrics(true);
             }}

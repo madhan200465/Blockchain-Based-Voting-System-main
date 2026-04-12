@@ -33,7 +33,7 @@ const Home = (props: RouteProps): JSX.Element => {
         <p className="text-normal">
           Status: <span className={`status-badge ${status}`}>{status}</span>
           {status === "finished" && (
-            <span style={{ marginLeft: "10px", color: published ? "#14b8a6" : "#f59e0b" }}>
+            <span className={`publication-note ${published ? "published" : "review-only"}`}>
               {published ? "public" : "review only"}
             </span>
           )}

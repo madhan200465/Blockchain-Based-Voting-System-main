@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BackButton from "../components/Back";
+import Navbar from "../components/Navbar";
 
 type MenuLink = {
   name: string;
@@ -15,20 +16,15 @@ type DefaultProps = {
 const Default = (props: DefaultProps) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    document.getElementById("default-sidebar")?.classList.add("hide");
-    document.getElementById("default-sidebar")?.classList.remove("display");
+    const hideIfOutside = (event: MouseEvent) => {
+      const sidebarElement = document.getElementById("default-sidebar");
+      const toggleButton = document.getElementById("outside-ham");
 
-    const hideIfOutside = (e: any) => {
-      const sidebar = document.getElementById("default-sidebar");
-      const outsideHam = document.getElementById("outside-ham");
-
-      if (!sidebar?.contains(e.target) && !outsideHam?.contains(e.target)) {
-        if (!sidebar?.classList.contains("hide")) {
-          sidebar?.classList.add("hide");
-          sidebar?.classList.remove("display");
-        }
+      if (!sidebarElement?.contains(event.target as Node) && !toggleButton?.contains(event.target as Node)) {
+        setSidebarOpen(false);
       }
     };
 
@@ -40,42 +36,58 @@ const Default = (props: DefaultProps) => {
   }, []);
 
   const toggleHandler = () => {
-    document.getElementById("default-sidebar")?.classList.toggle("hide");
-    document.getElementById("default-sidebar")?.classList.toggle("display");
+    setSidebarOpen((current) => !current);
   };
 
   return (
     <div className="default-container">
-      <div className="default-sidebar-container">
-        <div onClick={toggleHandler} id="outside-ham" className="hamburger">
-          <i className="bi bi-list"></i>
+      <div id="default-sidebar" className={`default-sidebar ${sidebarOpen ? "display" : "hide"}`}>
+        <div className="sidebar-brand">
+          <div className="brand-mark">
+            <i className="bi bi-shield-check"></i>
+          </div>
+          <div>
+            <div className="brand-name">SecureVote</div>
+            <div className="brand-subtitle">Election workspace</div>
+          </div>
         </div>
 
-        <div id="default-sidebar" className="default-sidebar">
-          <div onClick={toggleHandler} className="hamburger">
-            <i className="bi bi-list"></i>
-          </div>
-
+        <div className="sidebar-links">
           {props.menu.map(({ name, link }, index) => (
-            <div
+            <button
               key={index}
+              type="button"
               onClick={() => {
                 toggleHandler();
                 navigate(link);
               }}
-              className={`default-sidebar-link ${
-                pathname == link ? "active" : ""
-              }`}
+              className={`default-sidebar-link ${pathname === link ? "active" : ""}`}
             >
               {name}
-            </div>
+            </button>
           ))}
         </div>
       </div>
 
-      <div className="default-content">
-        <BackButton call={() => navigate(-1)} />
-        {props.children}
+      <button id="outside-ham" onClick={toggleHandler} className="hamburger" type="button" aria-label="Open navigation">
+        <i className="bi bi-list"></i>
+      </button>
+
+      <button
+        className={`default-backdrop ${sidebarOpen ? "show" : ""}`}
+        type="button"
+        onClick={toggleHandler}
+        aria-label="Close navigation"
+      />
+
+      <div className="default-content-shell">
+        <Navbar />
+        <div className="default-content">
+          <div className="default-frame">
+            {pathname !== "/profile" ? <BackButton call={() => navigate(-1)} /> : null}
+            <div className="default-panel">{props.children}</div>
+          </div>
+        </div>
       </div>
     </div>
   );

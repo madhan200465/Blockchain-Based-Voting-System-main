@@ -1,17 +1,28 @@
 .landing-container {
   min-height: 100vh;
-  background-color: #0f172a;
+  background: transparent;
   display: flex;
   flex-direction: column;
   color: #f8fafc;
   overflow-x: hidden;
+  position: relative;
 
   .landing-header {
-    padding: 30px 80px;
+    padding: 24px 80px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(2, 6, 23, 0.28);
+    backdrop-filter: blur(16px);
+
+    .landing-header-actions {
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
 
     .logo {
       display: flex;
@@ -28,18 +39,22 @@
     }
 
     .nav-link {
-      color: #94a3b8;
+      color: #c4d0e4;
       text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
+      font-weight: 600;
+      transition: color 0.3s ease, opacity 0.3s ease;
+      opacity: 0.82;
 
       &:hover {
-        color: #6366f1;
+        color: #f8fafc;
+        opacity: 1;
       }
     }
   }
 
   .hero-section {
+    width: min(100%, var(--app-content-max));
+    margin: 0 auto;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -50,15 +65,26 @@
 
     .hero-content {
       max-width: 800px;
-      margin-bottom: 60px;
+      margin-bottom: 56px;
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: rgba(109, 124, 255, 0.12);
+        border: 1px solid rgba(109, 124, 255, 0.16);
+        color: #dce3ff;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
 
       .title-large {
-        font-size: 3.5rem;
-        font-weight: 800;
         margin-bottom: 1rem;
-        background: linear-gradient(to right, #f8fafc, #94a3b8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
       }
 
       .title-small {
@@ -69,11 +95,51 @@
         margin-bottom: 10px;
       }
 
-      p {
+      .hero-copy {
         max-width: 600px;
         margin: 0 auto;
-        color: #94a3b8;
+        color: #afbdd0;
         font-size: 1.1rem;
+      }
+
+      .hero-actions {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+
+        button {
+          margin-right: 0;
+        }
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 34px;
+
+        div {
+          @include glass;
+          padding: 18px;
+          border-radius: 18px;
+          text-align: left;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        strong {
+          font-size: 1.05rem;
+          color: $text-light;
+          font-family: "Space Grotesk", sans-serif;
+        }
+
+        span {
+          color: $text-muted;
+          font-size: 0.84rem;
+        }
       }
     }
 
@@ -82,18 +148,21 @@
       gap: 30px;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: stretch;
 
       .portal-card {
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(12px);
         width: 320px;
         padding: 40px;
-        border-radius: 24px;
+        border-radius: 26px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: space-between;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 420px;
 
         &:hover {
           transform: translateY(-10px);
@@ -125,6 +194,7 @@
           color: #94a3b8;
           margin-bottom: 30px;
           font-size: 1rem;
+          line-height: 1.65;
         }
 
         button {
@@ -149,9 +219,20 @@
 
 @media (max-width: 768px) {
   .landing-header {
-    padding: 20px !important;
+    padding: 18px 20px !important;
+    flex-direction: column;
+    align-items: flex-start;
   }
+
+  .hero-stats {
+    grid-template-columns: 1fr !important;
+  }
+
   .title-large {
     font-size: 2.5rem !important;
+  }
+
+  .hero-content {
+    margin-bottom: 42px !important;
   }
 }

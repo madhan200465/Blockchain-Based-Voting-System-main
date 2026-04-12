@@ -66,17 +66,17 @@ const Result = () => {
   return (
     <Panel name={data.name} description={data.description}>
       <>
-        <div className="status-message card-premium" style={{ marginBottom: '25px', textAlign: 'center', padding: '18px' }}>
-          <h4 className="title-small" style={{ marginBottom: '8px' }}>
+        <div className="status-message card-premium status-message-compact">
+          <h4 className="title-small">
             {publication.published ? "Results are public" : "Commission review only"}
           </h4>
-          <p className="text-normal" style={{ marginBottom: 0 }}>
+          <p className="text-normal">
             {publication.published
               ? "Voters can now see the final result summary."
               : "Only commission members can see the tally until the results are published."}
           </p>
           {publication.published && publishedOn && (
-            <p className="text-normal" style={{ marginTop: '8px', opacity: 0.85 }}>
+            <p className="text-normal muted-meta">
               Published on: {publishedOn}
             </p>
           )}
@@ -105,11 +105,10 @@ const Result = () => {
 
         <Chart votes={data.votes} />
 
-        <div className="dashboard-actions" style={{ marginTop: '30px', textAlign: 'center' }}>
+        <div className="dashboard-actions">
           <button
             onClick={publishResults}
             className="button-secondary"
-            style={{ minWidth: '200px', marginRight: '12px' }}
             disabled={publishing || publication.published}
           >
             {publication.published ? "Results Published" : publishing ? "Publishing..." : "Publish Results"}
@@ -117,7 +116,6 @@ const Result = () => {
           <button
             onClick={resetElection}
             className="end-election-button button-primary"
-            style={{ minWidth: '200px' }}
           >
             Reset Election
           </button>

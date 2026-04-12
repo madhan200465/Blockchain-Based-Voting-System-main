@@ -4,7 +4,8 @@ import { MdGppGood, MdLibraryAddCheck, MdLock, MdShare } from "react-icons/md";
 
 const Features = () => {
   return (
-    <div className="features-wrapper">
+    <div className="features-wrapper" id="features">
+      <div className="section-eyebrow">Platform capabilities</div>
       <div className="title-large">Secured by Blockchain</div>
       <div className="title-small">
         Ensuring transparency, integrity, and trust through decentralized technology.

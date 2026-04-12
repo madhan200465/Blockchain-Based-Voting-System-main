@@ -14,10 +14,10 @@ const StatusNotice = ({
   iconColor = "#f59e0b",
 }: StatusNoticeProps) => {
   return (
-    <div className="status-message card-premium" style={{ textAlign: "center", padding: "40px" }}>
+    <div className="status-message card-premium">
       <i
-        className={iconClass}
-        style={{ fontSize: "3rem", color: iconColor, marginBottom: "20px", display: "block" }}
+        className={`${iconClass} status-message-icon`}
+        style={{ color: iconColor }}
       ></i>
       <h3 className="title-small">{title}</h3>
       <p className="text-normal">{message}</p>

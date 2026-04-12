@@ -1,6 +1,10 @@
 .feature-container {
   display: flex;
   align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  @include glass;
 
   .align-left {
     text-align: left;
@@ -10,7 +14,8 @@
   }
 
   .icon-container {
-    font-size: 4rem;
-    padding: 20px;
+    font-size: 3.2rem;
+    padding: 16px;
+    color: $theme-accent;
   }
 }

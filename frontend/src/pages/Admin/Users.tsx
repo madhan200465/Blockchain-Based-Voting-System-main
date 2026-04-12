@@ -6,6 +6,7 @@ type User = {
   name: string;
   citizenshipNumber: string;
   email: string;
+    voterId?: string | null;
 };
 
 const Users = () => {
@@ -84,42 +85,25 @@ const Users = () => {
             <div className="dashboard-header">
                 <h2 className="title-small">Voter Management System</h2>
                 <p className="text-normal">Review registration requests and manage the active voter registry.</p>
-                                <button
-                                    onClick={() => fetchData(false)}
-                                    className="button-secondary"
-                                    style={{ marginTop: '12px', minWidth: '180px' }}
-                                    disabled={refreshing}
-                                >
-                                    {refreshing ? 'Refreshing...' : 'Refresh Requests'}
-                                </button>
+                <button
+                    onClick={() => fetchData(false)}
+                    className="button-secondary refresh-button"
+                    disabled={refreshing}
+                >
+                    {refreshing ? 'Refreshing...' : 'Refresh Requests'}
+                </button>
             </div>
 
-            <div className="tab-navigation" style={{ display: 'flex', gap: '20px', marginBottom: '30px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
+            <div className="tab-navigation">
                 <button 
                   onClick={() => setActiveTab("pending")}
                   className={`tab-item ${activeTab === 'pending' ? 'active' : ''}`}
-                  style={{ 
-                    background: 'none', 
-                    border: 'none', 
-                    color: activeTab === 'pending' ? '#6366f1' : '#94a3b8',
-                    borderBottom: activeTab === 'pending' ? '2px solid #6366f1' : 'none',
-                    padding: '10px 0',
-                    borderRadius: '0'
-                  }}
                 >
                     Pending Requests ({pendingUsers.length})
                 </button>
                 <button 
                   onClick={() => setActiveTab("registry")}
-                  className={`tab-item ${activeTab === 'registry' ? 'active' : ''}`}
-                  style={{ 
-                    background: 'none', 
-                    border: 'none', 
-                    color: activeTab === 'registry' ? '#14b8a6' : '#94a3b8',
-                    borderBottom: activeTab === 'registry' ? '2px solid #14b8a6' : 'none',
-                    padding: '10px 0',
-                    borderRadius: '0'
-                  }}
+                  className={`tab-item ${activeTab === 'registry' ? 'active registry' : ''}`}
                 >
                     Active Voter Registry ({verifiedUsers.length})
                 </button>
@@ -127,19 +111,21 @@ const Users = () => {
             
             <div className="users-wrapper dashboard-content">
                 {currentList.length === 0 ? (
-                    <div className="empty-state" style={{ textAlign: 'center', padding: '60px', opacity: 0.5 }}>
-                        <i className={`bi ${activeTab === 'pending' ? 'bi-person-check' : 'bi-people'}`} style={{ fontSize: '3rem', marginBottom: '15px', display: 'block' }}></i>
+                    <div className="empty-state">
+                        <i className={`bi ${activeTab === 'pending' ? 'bi-person-check' : 'bi-people'}`}></i>
                         <p>{activeTab === 'pending' ? 'No pending verification requests.' : 'The voter registry is currently empty.'}</p>
                     </div>
                 ) : (
                     currentList.map((user, index) => (
-                        <div key={index} className="user-wrapper card-premium" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div key={index} className="user-wrapper card-premium">
                             <div className="user-info">
-                                <div className="user-name" style={{ fontSize: '1.2rem', fontWeight: '600' }}>{user.name}</div>
-                                <div className="user-email" style={{ fontSize: '0.9rem', color: '#94a3b8' }}>{user.email}</div>
-                                <div className="user-id" style={{ marginTop: '10px', color: activeTab === 'pending' ? '#6366f1' : '#14b8a6', fontWeight: '500' }}>
-                                    <i className="bi bi-card-text" style={{ marginRight: '8px' }}></i>
-                                    Voter ID: {user.citizenshipNumber}
+                                <div className="user-name">{user.name}</div>
+                                <div className="user-email">{user.email}</div>
+                                <div className={`user-id ${activeTab === 'pending' ? 'pending' : 'registry'}`}>
+                                    <i className="bi bi-card-text"></i>
+                                    {activeTab === 'pending'
+                                      ? `Voter ID: Pending assignment (Citizenship: ${user.citizenshipNumber})`
+                                      : `Voter ID: ${user.voterId || "Not assigned"}`}
                                 </div>
                             </div>
 
@@ -149,14 +135,12 @@ const Users = () => {
                                         <button
                                             onClick={() => verifyUser(user.id)}
                                             className="button-primary"
-                                            style={{ padding: '8px 20px' }}
                                         >
                                             Approve
                                         </button>
                                         <button
                                             onClick={() => deleteUser(user.id)}
                                             className="button-black"
-                                            style={{ padding: '8px 20px', marginLeft: '10px' }}
                                         >
                                             Reject
                                         </button>
@@ -164,8 +148,7 @@ const Users = () => {
                                 ) : (
                                     <button
                                         onClick={() => revokeUser(user.id)}
-                                        className="button-secondary"
-                                        style={{ padding: '8px 20px', color: '#ef4444' }}
+                                        className="button-secondary danger"
                                     >
                                         Revoke Access
                                     </button>

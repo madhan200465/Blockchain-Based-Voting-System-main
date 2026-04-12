@@ -1,0 +1,545 @@
+{
+  "info": {
+    "_postman_id": "bd39f3de-5d08-4ed7-a5d2-e09722fa3fb2",
+    "name": "BBVS API",
+    "description": "Postman collection for end-to-end testing of Blockchain Based Voting System APIs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Ping",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ping",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ping"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.test('Ping response is valid', function () {",
+                  "  pm.expect(body.status).to.eql('ok');",
+                  "  pm.expect(body.message).to.eql('pong');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.expect(body.accessToken).to.be.a('string').and.not.empty;",
+                  "pm.environment.set('accessToken', body.accessToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Auth Check",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "check"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "if (body.accessToken) { pm.environment.set('accessToken', body.accessToken); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Onboarding Flow",
+      "item": [
+        {
+          "name": "Signup New Voter",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now().toString();",
+                  "pm.environment.set('signupName', `Voter ${ts.slice(-4)}`);",
+                  "pm.environment.set('signupEmail', `voter.${ts}@mail.local`);",
+                  "pm.environment.set('signupCitizenshipNumber', ts.slice(-10));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Signup status is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('pendingUserId', String(body.id));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{signupName}}\",\n  \"email\": \"{{signupEmail}}\",\n  \"citizenshipNumber\": \"{{signupCitizenshipNumber}}\",\n  \"password\": \"{{signupPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin List Pending Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "all"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin Verify Pending User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{pendingUserId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "verify"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Verify status is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "if (body.user && body.user.id) { pm.environment.set('verifiedUserId', String(body.user.id)); }",
+                  "if (body.user && body.user.voterId) { pm.environment.set('assignedVoterId', body.user.voterId); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin List Verified Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/verified",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "verified"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Voter Flow",
+      "item": [
+        {
+          "name": "Login Verified Voter by Voter ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"voterId\": \"{{assignedVoterId}}\",\n  \"password\": \"{{signupPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Voter login status is 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.environment.set('voterAccessToken', body.accessToken || '');",
+                  "if (body.user) {",
+                  "  pm.environment.set('currentUserId', String(body.user.id || ''));",
+                  "  pm.environment.set('currentUserName', body.user.name || '');",
+                  "  pm.environment.set('currentVoterId', body.user.voterId || '');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check Voteability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{currentUserId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/polls/check-voteability",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "polls",
+                "check-voteability"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cast Vote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{currentUserId}}\",\n  \"name\": \"{{currentUserName}}\",\n  \"candidate\": \"{{candidateOne}}\",\n  \"voterId\": \"{{currentVoterId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/polls/vote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "polls",
+                "vote"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Poll Flow",
+      "item": [
+        {
+          "name": "Poll Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/polls/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "polls",
+                "status"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Start Election",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{electionName}}\",\n  \"description\": \"{{electionDescription}}\",\n  \"candidates\": [\n    { \"name\": \"{{candidateOne}}\", \"info\": \"Candidate one\" },\n    { \"name\": \"{{candidateTwo}}\", \"info\": \"Candidate two\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/polls/start",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "polls",
+                "start"
+              ]
+            }
+          }
+        },
+        {
+          "name": "End Election",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/polls/end",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "polls",
+                "end"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Publish Results",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/polls/publish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "polls",
+                "publish"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin Votes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/polls/votes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "polls",
+                "votes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reset Election",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/polls/reset",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "polls",
+                "reset"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Results",
+      "item": [
+        {
+          "name": "Public Poll Snapshot",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/polls/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "polls"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

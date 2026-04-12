@@ -45,6 +45,7 @@ export default async (req: Request, res: Response) => {
   newUser.email = email.toLowerCase();
   newUser.password = hashedPassword;
   newUser.citizenshipNumber = citizenshipNumber;
+  newUser.voterId = null;
   newUser.verified = false;
 
   try {

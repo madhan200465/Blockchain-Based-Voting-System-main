@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import ElectionContract, { web3 } from "../../web3";
 import { User } from "../../entity/User";
 import * as yup from "yup";
+import { generateVoterId, isValidVoterId, normalizeVoterId } from "../../utils/voterId";
 
 const checkSchema = yup.object({
   body: yup.object({
@@ -38,7 +39,11 @@ const schema = yup.object({
     id: yup.string().required(),
     name: yup.string().min(3).required(),
     candidate: yup.string().min(3).required(),
-    voterId: yup.string().required("Voter ID is required"),
+    voterId: yup
+      .string()
+      .trim()
+      .matches(/^[a-zA-Z0-9]{6,24}$/, "Voter ID must be 6-24 alphanumeric characters")
+      .required("Voter ID is required"),
   }),
 });
 
@@ -50,6 +55,11 @@ export default async (req: Request, res: Response) => {
   }
 
   const { id, name, candidate, voterId } = req.body;
+  const normalizedInputVoterId = normalizeVoterId(voterId);
+
+  if (!isValidVoterId(normalizedInputVoterId)) {
+    return res.status(400).send("Voter ID must be 6-24 alphanumeric characters");
+  }
 
   // 1. Fetch user from DB
   const user = await User.findOne({ where: { id } });
@@ -58,8 +68,15 @@ export default async (req: Request, res: Response) => {
   // 2. Check if user is verified
   if (!user.verified) return res.status(401).send("User not verified by Election Commission");
 
-  // 3. Verify Voter ID matches Citizenship Number
-  if (user.citizenshipNumber !== voterId) {
+  // Auto-heal legacy records that used non-standard voter identifiers.
+  const normalizedUserVoterId = normalizeVoterId(user.voterId);
+  if (!isValidVoterId(normalizedUserVoterId)) {
+    user.voterId = generateVoterId(user.id);
+    await User.save(user);
+  }
+
+  // 3. Verify provided voter ID matches verified user voter ID
+  if (normalizeVoterId(user.voterId) !== normalizedInputVoterId) {
     return res.status(401).send("Invalid Voter ID Number");
   }
 

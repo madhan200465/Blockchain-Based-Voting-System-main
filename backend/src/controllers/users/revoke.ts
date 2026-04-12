@@ -4,7 +4,19 @@ import * as yup from "yup";
 
 const schema = yup.object({
   body: yup.object({
-    userId: yup.number().integer().required(),
+    userId: yup
+      .number()
+      .transform((value, originalValue) => {
+        if (typeof originalValue === "string") {
+          const parsed = Number(originalValue.trim());
+          return Number.isNaN(parsed) ? value : parsed;
+        }
+
+        return value;
+      })
+      .typeError("Invalid user id")
+      .integer()
+      .required(),
   }),
 });
 

@@ -5,16 +5,28 @@ interface BallotProps {
   candidates: string[];
   userId?: number;
   userName?: string;
+  voterId?: string;
   enableVote?: boolean;
 }
 
 const Ballot = (props: BallotProps) => {
+  const normalizedSavedVoterId = (props.voterId || "").trim().toUpperCase();
+  const hasValidSavedVoterId = /^[A-Z0-9]{6,24}$/.test(normalizedSavedVoterId);
+
   const vote = (candidate: string) => {
-    const voterId = window.prompt(
-      "Please enter your Voter ID (Citizenship Number) to confirm your vote:"
+    const voterIdInput = window.prompt(
+      "Please enter your Voter ID (alphanumeric, e.g. VOT000123) to confirm your vote:",
+      hasValidSavedVoterId ? normalizedSavedVoterId : ""
     );
 
+    const voterId = voterIdInput?.trim().toUpperCase() || "";
+
     if (!voterId) return;
+
+    if (!/^[A-Z0-9]{6,24}$/.test(voterId)) {
+      alert("Invalid Voter ID format. Use 6-24 letters/numbers only.");
+      return;
+    }
 
     axios
       .post("/polls/vote", {
@@ -66,6 +78,13 @@ const Ballot = (props: BallotProps) => {
               <i className="bi bi-shield-check"></i>
               <span>Your vote has been verified and stored in the blockchain registry.</span>
           </div>
+      )}
+
+      {props.enableVote && !hasValidSavedVoterId && (
+        <div className="post-vote-message">
+          <i className="bi bi-info-circle"></i>
+          <span>Your verified voter ID is not available yet. Please contact the commission admin if this persists.</span>
+        </div>
       )}
     </div>
   );

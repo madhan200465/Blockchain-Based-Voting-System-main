@@ -11,6 +11,9 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   citizenshipNumber!: string;
 
+  @Column({ type: "varchar", length: 24, unique: true, nullable: true })
+  voterId!: string | null;
+
   @Column({ length: 180, unique: true })
   email!: string;
 

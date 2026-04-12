@@ -8,9 +8,11 @@ const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <CustomRoutes />
+        <div className="app-shell">
+          <CustomRoutes />
+          <Footer />
+        </div>
       </AuthProvider>
-      <Footer />
     </BrowserRouter>
   );
 };

@@ -25,8 +25,8 @@ const Login = (props: RouteProps & LoginProps): JSX.Element => {
 
   const loginSchema = Yup.object().shape({
     email: isAdminMode ? Yup.string().email("Invalid email").required("Required") : Yup.string(),
-    voterId: isVoterMode ? Yup.string().required("Required") : Yup.string(),
-    credential: isMixedMode ? Yup.string().trim().required("Required") : Yup.string(),
+    voterId: Yup.string(),
+    credential: (isVoterMode || isMixedMode) ? Yup.string().trim().required("Required") : Yup.string(),
     password: Yup.string().min(3).required("Required"),
   });
 
@@ -74,10 +74,15 @@ const Login = (props: RouteProps & LoginProps): JSX.Element => {
                       password: values.password,
                     }
                   : isVoterMode
-                  ? {
-                      voterId: values.voterId.trim(),
-                      password: values.password,
-                    }
+                  ? values.credential.includes("@")
+                    ? {
+                        email: values.credential.trim(),
+                        password: values.password,
+                      }
+                    : {
+                        voterId: values.credential.trim(),
+                        password: values.password,
+                      }
                   : credential.includes("@")
                   ? {
                       email: credential,
@@ -133,10 +138,10 @@ const Login = (props: RouteProps & LoginProps): JSX.Element => {
                     />
                   ) : isVoterMode ? (
                     <input
-                      id="voterId"
+                      id="credential"
                       type="text"
-                      placeholder="Voter ID (Citizenship Number)"
-                      {...getFieldProps("voterId")}
+                      placeholder="Email or Voter ID"
+                      {...getFieldProps("credential")}
                     />
                   ) : (
                     <input
@@ -150,7 +155,7 @@ const Login = (props: RouteProps & LoginProps): JSX.Element => {
                     {isAdminMode
                       ? (touched.email && errors.email ? errors.email : null)
                       : isVoterMode
-                      ? (touched.voterId && errors.voterId ? errors.voterId : null)
+                      ? (touched.credential && errors.credential ? errors.credential : null)
                       : (touched.credential && errors.credential ? errors.credential : null)
                     }
                   </div>
