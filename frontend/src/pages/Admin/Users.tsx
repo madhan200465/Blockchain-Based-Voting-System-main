@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import axios from "../../axios";
 
 type User = {
   id: number;
   name: string;
-  citizenshipNumber: string;
+    citizenshipNumber?: string | null;
   email: string;
     voterId?: string | null;
 };
 
 const Users = () => {
+    const navigate = useNavigate();
     const [pendingUsers, setPendingUsers] = useState<User[]>([]);
     const [verifiedUsers, setVerifiedUsers] = useState<User[]>([]);
     const [activeTab, setActiveTab] = useState<"pending" | "registry">("pending");
@@ -124,7 +126,7 @@ const Users = () => {
                                 <div className={`user-id ${activeTab === 'pending' ? 'pending' : 'registry'}`}>
                                     <i className="bi bi-card-text"></i>
                                     {activeTab === 'pending'
-                                      ? `Voter ID: Pending assignment (Citizenship: ${user.citizenshipNumber})`
+                                      ? "Voter ID: Pending assignment (open Preview for full details)"
                                       : `Voter ID: ${user.voterId || "Not assigned"}`}
                                 </div>
                             </div>
@@ -132,6 +134,12 @@ const Users = () => {
                             <div className="user-actions">
                                 {activeTab === "pending" ? (
                                     <>
+                                        <button
+                                            onClick={() => navigate(`/verify/${user.id}`)}
+                                            className="button-secondary"
+                                        >
+                                            Preview
+                                        </button>
                                         <button
                                             onClick={() => verifyUser(user.id)}
                                             className="button-primary"

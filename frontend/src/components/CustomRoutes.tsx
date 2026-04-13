@@ -42,7 +42,7 @@ const CustomRoutes = () => {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/users" element={<AdminUsersPage />} />
-              <Route path="/verify/:name/:id" element={<AdminVerifyPage />} />
+              <Route path="/verify/:id" element={<AdminVerifyPage />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Routes>
           </Default>

@@ -518,7 +518,8 @@ button,
 @import "./components/Polls/Chart.scss";
 @import "./components/Polls/Panel.scss";
 @import "./components/BiometricScanner.scss";
-@import "./components/Analytics.scss";
+@import "./pages/Admin/Polls.scss";
+@import "./pages/Admin/Verify.scss";
 
 /* Premium Ballot Styles */
 .ballot-container {

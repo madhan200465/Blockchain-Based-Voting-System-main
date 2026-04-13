@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import path from "path";
 
 import authRouter from "./routers/auth";
 import pollsRouter from "./routers/polls";
@@ -16,6 +17,7 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 app.use("/auth", authRouter);
 app.use("/polls", pollsRouter);
 app.use("/users", usersRouter);
